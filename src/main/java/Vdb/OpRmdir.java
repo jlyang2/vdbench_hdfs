@@ -8,30 +8,23 @@ package Vdb;
  * Author: Henk Vandenbergh.
  */
 
-class OpRmdir extends FwgThread
-{
-  private final static String c =
-  "Copyright (c) 2000, 2012, Oracle and/or its affiliates. All rights reserved.";
-
+class OpRmdir extends FwgThread {
+  private final static String c = "Copyright (c) 2000, 2012, Oracle and/or its affiliates. All rights reserved.";
 
   private boolean rmdir_max = (SlaveWorker.work.fwd_rate == RD_entry.MAX_RATE);
 
-  public OpRmdir(Task_num tn, FwgEntry fwg)
-  {
+  public OpRmdir(Task_num tn, FwgEntry fwg) {
     super(tn, fwg);
   }
 
   /**
-   * Create a directory.
-   * Search for a directory who is missing a parent, and then
+   * Create a directory. Search for a directory who is missing a parent, and then
    * create the highest level missing parent.
    */
-  protected boolean doOperation()
-  {
+  protected boolean doOperation() {
     Directory dir = null;
 
-    while (true)
-    {
+    while (true) {
       if (SlaveJvm.isWorkloadDone())
         return false;
 
@@ -41,21 +34,19 @@ class OpRmdir extends FwgThread
       if (dir == null)
         return false;
 
-      if (!dir.setBusy(true))
-      {
-        //common.ptod("dir1: " + dir.getFullName());
+      if (!dir.setBusy(true)) {
+        // common.ptod("dir1: " + dir.getFullName());
         block(Blocked.DIR_BUSY_RMDIR);
         continue;
       }
 
-      if (!dir.exist())
-      {
+      if (!dir.exist()) {
         dir.setBusy(false);
 
         if (!canWeGetMoreDirectories(msg2))
           return false;
 
-        //common.ptod("dir2: " + dir.getFullName());
+        // common.ptod("dir2: " + dir.getFullName());
         block(Blocked.DIR_DOES_NOT_EXIST, dir.getFullName());
         continue;
       }
@@ -64,27 +55,23 @@ class OpRmdir extends FwgThread
       if (rmdir_max)
         deleteChildren(dir.getChildren());
 
-      if (dir.anyExistingChildren())
-      {
+      if (dir.anyExistingChildren()) {
         dir.setBusy(false);
         block(Blocked.DIR_STILL_HAS_CHILD, dir.getFullName());
         continue;
       }
 
       /* Can't delete directory if it still has some files: */
-      if (dir.countFiles(0, null) != 0)
-      {
+      if (dir.countFiles(0, null) != 0) {
         dir.setBusy(false);
         block(Blocked.DIR_STILL_HAS_FILES, dir.getFullName());
 
-        if (!canWeGetMoreFiles(msg))
-        {
+        if (!canWeGetMoreFiles(msg)) {
           common.where();
           return false;
         }
 
-        if (!canWeExpectFileDeletes(msg))
-        {
+        if (!canWeExpectFileDeletes(msg)) {
           common.where();
           return false;
         }
@@ -95,10 +82,9 @@ class OpRmdir extends FwgThread
       break;
     }
 
-
-    //  /* No locking required, since this (the parent) is still busy: */
-    //  if (format || rmdir_max)
-    //    deleteChildren(dir.getChildren());
+    // /* No locking required, since this (the parent) is still busy: */
+    // if (format || rmdir_max)
+    // deleteChildren(dir.getChildren());
 
     /* Now do the work: */
     dir.deleteDir(fwg);
@@ -107,29 +93,25 @@ class OpRmdir extends FwgThread
     return true;
   }
 
-
-  private void deleteChildren(Directory[] children)
-  {
+  private void deleteChildren(Directory[] children) {
     if (children == null)
       return;
 
-    for (Directory dir : children)
-    {
+    for (Directory dir : children) {
 
-      /* Lock this new child. The loop is in case an other thread is trying      */
+      /* Lock this new child. The loop is in case an other thread is trying */
       /* to delete this directory also, but he'll fail since the parent is busy: */
-      while (!dir.setBusy(true));
+      while (!dir.setBusy(true))
+        ;
 
-      if (!dir.exist())
-      {
+      if (!dir.exist()) {
         dir.setBusy(false);
         continue;
       }
 
       deleteChildren(dir.getChildren());
 
-      if (dir.countFiles(0, null) != 0)
-      {
+      if (dir.countFiles(0, null) != 0) {
         block(Blocked.DIR_STILL_HAS_FILES, dir.getFullName());
         dir.setBusy(false);
         continue;
@@ -142,21 +124,12 @@ class OpRmdir extends FwgThread
     }
   }
 
+  private String[] msg = { "Anchor: " + fwg.anchor.getAnchorName(),
+      "Vdbench is trying to delete a directory, but the directory that we are",
+      "trying to delete is not empty, and there are no threads currently", "active that can delete those files." };
 
-  private String[] msg =
-  {
-    "Anchor: " + fwg.anchor.getAnchorName(),
-    "Vdbench is trying to delete a directory, but the directory that we are",
-    "trying to delete is not empty, and there are no threads currently",
-    "active that can delete those files."
-  };
-
-  private String[] msg2 =
-  {
-    "Anchor: " + fwg.anchor.getAnchorName(),
-    "Vdbench is trying to delete a directory, but the directory that we are",
-    "trying to delete does not exist, and there are no threads currently",
-    "active that create new directories."
-  };
+  private String[] msg2 = { "Anchor: " + fwg.anchor.getAnchorName(),
+      "Vdbench is trying to delete a directory, but the directory that we are",
+      "trying to delete does not exist, and there are no threads currently", "active that create new directories." };
 
 }

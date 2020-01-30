@@ -16,28 +16,23 @@ import javax.swing.JTable;
 import java.awt.Insets;
 import Vdb.common;
 
-
 /**
  * Size the data with for a table column.
  */
-class TableWidth
-{
-  private final static String c =
-  "Copyright (c) 2000, 2012, Oracle and/or its affiliates. All rights reserved.";
+class TableWidth {
+  private final static String c = "Copyright (c) 2000, 2012, Oracle and/or its affiliates. All rights reserved.";
 
   /**
    * Automatically size the columns to the largest element.
    */
-  public static void sizeColumn(int col, JTable tbl)
-  {
+  public static void sizeColumn(int col, JTable tbl) {
     int largest = 0;
 
     /* Loop thru rows: */
-    for (int i = 0; i < tbl.getRowCount(); i++)
-    {
+    for (int i = 0; i < tbl.getRowCount(); i++) {
       Object value = tbl.getValueAt(i, col);
       if (!(value instanceof String))
-          continue;
+        continue;
 
       String str = (String) value;
 
@@ -48,13 +43,14 @@ class TableWidth
     if (tbl.getRowCount() == 0)
       return;
 
-    Insets insets = ((JComponent)tbl.getCellRenderer (0, col)).getInsets();
+    Insets insets = ((JComponent) tbl.getCellRenderer(0, col)).getInsets();
 
     largest += insets.left + insets.right + 5;
-    largest  = Math.max(largest, 25);
+    largest = Math.max(largest, 25);
 
     tbl.getColumnModel().getColumn(col).setMinWidth(largest);
-    //common.ptod("size_column(): " + largest + " " + insets.left + " " + insets.right);
+    // common.ptod("size_column(): " + largest + " " + insets.left + " " +
+    // insets.right);
   }
 
 }

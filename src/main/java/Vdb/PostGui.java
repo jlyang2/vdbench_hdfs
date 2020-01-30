@@ -28,51 +28,44 @@ import Utils.*;
 import Utils.Fget;
 import Utils.Fput;
 
-
-
 /**
  * Gui portion of DVPost
  */
-public class PostGui extends JFrame implements ActionListener
-{
-  private final static String c =
-  "Copyright (c) 2000, 2016, Oracle and/or its affiliates. All rights reserved.";
+public class PostGui extends JFrame implements ActionListener {
+  private final static String c = "Copyright (c) 2000, 2016, Oracle and/or its affiliates. All rights reserved.";
 
-  private JSplitPane  split_panel  = new JSplitPane();
+  private JSplitPane split_panel = new JSplitPane();
 
-  private JPanel      left_panel   = new JPanel();
-  private JScrollPane left_scroll  = new JScrollPane();
+  private JPanel left_panel = new JPanel();
+  private JScrollPane left_scroll = new JScrollPane();
   private JScrollPane error_scroll = new JScrollPane();
 
   private JScrollPane right_scroll = new JScrollPane();
-  private JTextArea   right_text   = new JTextArea();
-  private JPanel      buttons      = new JPanel();
+  private JTextArea right_text = new JTextArea();
+  private JPanel buttons = new JPanel();
 
-  private DVModel     left_model   = new DVModel();
-  private JTable      left_table   = new JTable();
+  private DVModel left_model = new DVModel();
+  private JTable left_table = new JTable();
 
   private StringBuffer overview;
-  private String    SELECT          = "Display selection";
-  private String    RESET           = "Reset selection";
-  private JButton   overview_button = new JButton("Overview");
-  private JButton   close_button    = new JButton("Close");
-  private JButton   reread          = new JButton("Reread block");
-  private JButton   lba_button      = new JButton("Display block");
-  private JButton   only_button     = new JButton(SELECT);
-  private JButton   save_button     = new JButton("Save text");
-  private JButton   read_text       = new JButton("Read text");
-  private JButton   read_error      = new JButton("Read errorlog");
-  private JTextArea error_text      = new JTextArea();
-  private String    filename       = "";
+  private String SELECT = "Display selection";
+  private String RESET = "Reset selection";
+  private JButton overview_button = new JButton("Overview");
+  private JButton close_button = new JButton("Close");
+  private JButton reread = new JButton("Reread block");
+  private JButton lba_button = new JButton("Display block");
+  private JButton only_button = new JButton(SELECT);
+  private JButton save_button = new JButton("Save text");
+  private JButton read_text = new JButton("Read text");
+  private JButton read_error = new JButton("Read errorlog");
+  private JTextArea error_text = new JTextArea();
+  private String filename = "";
 
-  private String   last_text = null;
+  private String last_text = null;
 
-
-  public PostGui(String file_in, DvKeyBlock[] bad_keyblocks, ArrayList overvw)
-  {
+  public PostGui(String file_in, DvKeyBlock[] bad_keyblocks, ArrayList overvw) {
     filename = file_in;
-    setTitle("Vdbench Data Validation post processing utility for file " +
-             new File(filename).getAbsolutePath());
+    setTitle("Vdbench Data Validation post processing utility for file " + new File(filename).getAbsolutePath());
     Dimension dim = new Dimension(1280, 768);
     setSize(dim);
     split_panel.setSize(dim);
@@ -84,7 +77,6 @@ public class PostGui extends JFrame implements ActionListener
     right_text.setFont(new Font("Courier New", Font.PLAIN, 12));
     setAndSaveText(overview.toString());
 
-
     left_table.setModel(left_model);
     left_model.setBlocks(bad_keyblocks);
 
@@ -94,49 +86,47 @@ public class PostGui extends JFrame implements ActionListener
     sizeColumn(2, left_table);
     sizeColumn(3, left_table);
 
-    overview_button .addActionListener(this);
-    close_button    .addActionListener(this);
-    lba_button      .addActionListener(this);
-    reread          .addActionListener(this);
-    only_button     .addActionListener(this);
-    save_button     .addActionListener(this);
-    read_text       .addActionListener(this);
-    read_error      .addActionListener(this);
-    buttons.add(close_button    );
-    buttons.add(overview_button );
-    buttons.add(reread          );
-    buttons.add(lba_button      );
-    buttons.add(only_button     );
-    buttons.add(save_button     );
-    buttons.add(read_text       );
-    buttons.add(read_error      );
+    overview_button.addActionListener(this);
+    close_button.addActionListener(this);
+    lba_button.addActionListener(this);
+    reread.addActionListener(this);
+    only_button.addActionListener(this);
+    save_button.addActionListener(this);
+    read_text.addActionListener(this);
+    read_error.addActionListener(this);
+    buttons.add(close_button);
+    buttons.add(overview_button);
+    buttons.add(reread);
+    buttons.add(lba_button);
+    buttons.add(only_button);
+    buttons.add(save_button);
+    buttons.add(read_text);
+    buttons.add(read_error);
 
+    /*
+     * 1 @param gridx The initial gridx value. 2 @param gridy The initial gridy
+     * value. 3 @param gridwidth The initial gridwidth value. 4 @param gridheight
+     * The initial gridheight value. 5 @param weightx The initial weightx value.
+     * 6 @param weighty The initial weighty value. 7 @param anchor The initial
+     * anchor value. 8 @param fill The initial fill value. 9 @param insets The
+     * initial insets value. 10 @param ipadx The initial ipadx value. 11 @param
+     * ipady The initial ipady value.
+     */
 
-  /*
-  *   1 @param gridx      The initial gridx value.
-  *   2 @param gridy      The initial gridy value.
-  *   3 @param gridwidth  The initial gridwidth value.
-  *   4 @param gridheight The initial gridheight value.
-  *   5 @param weightx    The initial weightx value.
-  *   6 @param weighty    The initial weighty value.
-  *   7 @param anchor     The initial anchor value.
-  *   8 @param fill       The initial fill value.
-  *   9 @param insets     The initial insets value.
-  *  10 @param ipadx      The initial ipadx value.
-  *  11 @param ipady      The initial ipady value.
-  */
-
-
-    /* 1  The initial gridx value.       * 5  The initial weightx value. */
-    /* 2  The initial gridy value.       * 6  The initial weighty value. */
-    /* 3  The initial gridwidth value.   * 7  The initial anchor value.  */
-    /* 4  The initial gridheight value.  * 8  The initial fill value.    */
-    /*                                     h  v  h  v  h    v    */
-    //add(mn_label,   new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+    /* 1 The initial gridx value. * 5 The initial weightx value. */
+    /* 2 The initial gridy value. * 6 The initial weighty value. */
+    /* 3 The initial gridwidth value. * 7 The initial anchor value. */
+    /* 4 The initial gridheight value. * 8 The initial fill value. */
+    /* h v h v h v */
+    // add(mn_label, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,
+    // GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0),
+    // 0, 0));
 
     left_panel.setLayout(new GridBagLayout());
-    left_panel.add(error_scroll,  new GridBagConstraints(0, 0, 1, 1, 0.5, 0.2, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
-    left_panel.add(left_scroll,   new GridBagConstraints(0, 1, 1, 1, 0.5, 0.8, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+    left_panel.add(error_scroll, new GridBagConstraints(0, 0, 1, 1, 0.5, 0.2, GridBagConstraints.WEST,
+        GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+    left_panel.add(left_scroll, new GridBagConstraints(0, 1, 1, 1, 0.5, 0.8, GridBagConstraints.WEST,
+        GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
     split_panel.setLeftComponent(left_panel);
     split_panel.setRightComponent(right_scroll);
@@ -147,74 +137,74 @@ public class PostGui extends JFrame implements ActionListener
     right_scroll.setViewportView(right_text);
     error_scroll.setViewportView(error_text);
 
-    error_scroll.setBorder(new TitledBorder(BorderFactory.createEtchedBorder(Color.white,new Color(148, 145, 140)),
-                                           "Short error text"));
-    left_scroll.setBorder(new TitledBorder(BorderFactory.createEtchedBorder(Color.white,new Color(148, 145, 140)),
-                                           "Failed Key blocks"));
-    //left_scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+    error_scroll.setBorder(
+        new TitledBorder(BorderFactory.createEtchedBorder(Color.white, new Color(148, 145, 140)), "Short error text"));
+    left_scroll.setBorder(
+        new TitledBorder(BorderFactory.createEtchedBorder(Color.white, new Color(148, 145, 140)), "Failed Key blocks"));
+    // left_scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 
+    addComponentListener(new ComponentAdapter() {
+      public void componentResized(ComponentEvent e) {
+        Component c = e.getComponent();
+      }
 
-    addComponentListener(new ComponentAdapter()
-                         {
-                           public void componentResized(ComponentEvent e)
-                           {
-                             Component c = e.getComponent();
-                           }
+    });
 
-                         });
+    addWindowListener(new WindowAdapter() {
+      public void windowClosing(WindowEvent e) {
+        System.exit(0);
+      }
+    });
 
-    addWindowListener(new WindowAdapter()
-                      {
-                        public void windowClosing(WindowEvent e)
-                        {
-                          System.exit(0);
-                        }
-                      });
+    left_table.addMouseListener(new java.awt.event.MouseAdapter() {
+      public void mousePressed(MouseEvent e) {
+        tbl_mousePressed(e);
+      }
+    });
+    left_table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+      public void valueChanged(ListSelectionEvent e) {
+        row_changed();
+      }
+    });
 
-    left_table.addMouseListener(new java.awt.event.MouseAdapter()
-                                {
-                                  public void mousePressed(MouseEvent e)
-                                  {
-                                    tbl_mousePressed(e);
-                                  }
-                                });
-    left_table.getSelectionModel().addListSelectionListener(new ListSelectionListener()
-                                                            {
-                                                              public void valueChanged(ListSelectionEvent e)
-                                                              {
-                                                                row_changed();
-                                                              }
-                                                            });
-
-    right_text.addMouseListener(new MouseAdapter()
-                                {
-                                  public void mouseClicked(MouseEvent e)
-                                  {
-                                    if (SwingUtilities.isLeftMouseButton(e) && (e.getClickCount() == 2))
-                                    {
-                                      displayOnly();
-                                    }
-                                  }
-                                });
+    right_text.addMouseListener(new MouseAdapter() {
+      public void mouseClicked(MouseEvent e) {
+        if (SwingUtilities.isLeftMouseButton(e) && (e.getClickCount() == 2)) {
+          displayOnly();
+        }
+      }
+    });
 
     /*
-    * @param gridx	The initial gridx value.
-    * @param gridy	The initial gridy value.
-    * @param gridwidth	The initial gridwidth value.
-    * @param gridheight	The initial gridheight value.
-    * @param weightx	The initial weightx value.
-    * @param weighty	The initial weighty value.
-    * @param anchor	The initial anchor value.
-    * @param fill	The initial fill value.
-    * @param insets	The initial insets value.
-    * @param ipadx	The initial ipadx value.
-    * @param ipady	The initial ipady value.
-    */
+     * @param gridx The initial gridx value.
+     * 
+     * @param gridy The initial gridy value.
+     * 
+     * @param gridwidth The initial gridwidth value.
+     * 
+     * @param gridheight The initial gridheight value.
+     * 
+     * @param weightx The initial weightx value.
+     * 
+     * @param weighty The initial weighty value.
+     * 
+     * @param anchor The initial anchor value.
+     * 
+     * @param fill The initial fill value.
+     * 
+     * @param insets The initial insets value.
+     * 
+     * @param ipadx The initial ipadx value.
+     * 
+     * @param ipady The initial ipady value.
+     */
 
     Container cp = getContentPane();
     cp.setLayout(new GridBagLayout());
-    cp.add(buttons,      new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
-    cp.add(split_panel,  new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+    cp.add(buttons, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.BOTH,
+        new Insets(0, 0, 0, 0), 0, 0));
+    cp.add(split_panel, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.BOTH,
+        new Insets(0, 0, 0, 0), 0, 0));
 
     left_table.setRowSelectionInterval(0, 0);
 
@@ -223,27 +213,22 @@ public class PostGui extends JFrame implements ActionListener
     Message.centerscreen(this);
   }
 
-  public void setText(String text)
-  {
+  public void setText(String text) {
     right_text.setText(text);
     right_text.setCaretPosition(0);
     only_button.setText(SELECT);
   }
-  public void setAndSaveText(String text)
-  {
+
+  public void setAndSaveText(String text) {
     setText(text);
     last_text = text;
   }
 
-  public void infoMsg(String text)
-  {
-    JOptionPane.showMessageDialog(this, text,
-                                  "Information message",
-                                  JOptionPane.INFORMATION_MESSAGE);
+  public void infoMsg(String text) {
+    JOptionPane.showMessageDialog(this, text, "Information message", JOptionPane.INFORMATION_MESSAGE);
   }
 
-  public void actionPerformed(ActionEvent e)
-  {
+  public void actionPerformed(ActionEvent e) {
     String cmd = e.getActionCommand();
 
     if (cmd.equals(overview_button.getText()))
@@ -274,17 +259,14 @@ public class PostGui extends JFrame implements ActionListener
       reReadCurrentLba();
   }
 
-
-  private void displayOnly()
-  {
+  private void displayOnly() {
     if (right_text.getSelectedText() == null)
       return;
     String selection = right_text.getSelectedText().toLowerCase();
     StringBuffer txt = new StringBuffer(65536);
 
     StringTokenizer st = new StringTokenizer(last_text, "\n");
-    while (st.hasMoreTokens())
-    {
+    while (st.hasMoreTokens()) {
       String token = st.nextToken();
       if (token.toLowerCase().indexOf(selection) != -1)
         txt.append(token + "\n");
@@ -297,8 +279,7 @@ public class PostGui extends JFrame implements ActionListener
   /**
    * Double click in table.
    */
-  void tbl_mousePressed(MouseEvent e)
-  {
+  void tbl_mousePressed(MouseEvent e) {
     /* Double click gives controller detail summary, except for COL_SIZE: */
     int row = left_table.getSelectedRow();
 
@@ -308,23 +289,18 @@ public class PostGui extends JFrame implements ActionListener
       row_changed();
   }
 
-
   /**
    * New row selected
    */
-  void row_changed()
-  {
+  void row_changed() {
     int row = left_table.getSelectedRow();
     DvKeyBlock bb = left_model.getRowAt(row);
-    error_text.setText("Double click on any row to display just this Key block.\n" +
-                       "Double click on any data on the right side " +
-                       "to only display selected values.\nErrors for this block:\n" +
-                       bb.getBlockStatus());
+    error_text.setText(
+        "Double click on any row to display just this Key block.\n" + "Double click on any data on the right side "
+            + "to only display selected values.\nErrors for this block:\n" + bb.getBlockStatus());
   }
 
-
-  private void saveDisplayData()
-  {
+  private void saveDisplayData() {
     String fname = askForFile(filename, "Enter file name:");
     if (fname == null)
       return;
@@ -336,18 +312,16 @@ public class PostGui extends JFrame implements ActionListener
     fp.close();
   }
 
-  private void readDisplayData(String name)
-  {
+  private void readDisplayData(String name) {
     String fname = name;
-    if (name == null)
-    {
+    if (name == null) {
       fname = askForFile(filename, "Enter file name:");
       if (fname == null)
         return;
     }
 
-    Fget fg             = new Fget(fname);
-    String line         = null;
+    Fget fg = new Fget(fname);
+    String line = null;
     StringBuffer buffer = new StringBuffer(32768);
     while ((line = fg.get()) != null)
       buffer.append(line + "\n");
@@ -356,22 +330,19 @@ public class PostGui extends JFrame implements ActionListener
     setAndSaveText(buffer.toString());
   }
 
-  private void reReadCurrentLba()
-  {
+  private void reReadCurrentLba() {
     int row = left_table.getSelectedRow();
     DvKeyBlock bb = left_model.getRowAt(row);
 
     /* Modify the block: */
     long handle = Native.openFile(bb.lun);
-    if (handle < 0)
-    {
+    if (handle < 0) {
       infoMsg(String.format("Lun '%s' either does not exist or you do not have read access.", bb.lun));
       return;
     }
     Native.closeFile(handle);
 
-    Vector lines = PrintBlock.printit(bb.lun, bb.logical_lba - bb.file_start_lba,
-                                      bb.key_block_size, bb.key_block_size);
+    Vector lines = PrintBlock.printit(bb.lun, bb.logical_lba - bb.file_start_lba, bb.key_block_size, bb.key_block_size);
     StringBuffer txt = new StringBuffer(65536);
     for (int i = 0; i < lines.size(); i++)
       txt.append((String) lines.elementAt(i) + "\n");
@@ -379,13 +350,10 @@ public class PostGui extends JFrame implements ActionListener
     setAndSaveText(txt.toString());
   }
 
+  private void displayCurrentLba() {
 
-
-  private void displayCurrentLba()
-  {
-
-    SimpleDateFormat df1 = new SimpleDateFormat( "MMM dd, yyyy HH:mm:ss.SSS zzz" );
-    String        format = "%" + df1.toPattern().length() + "s";
+    SimpleDateFormat df1 = new SimpleDateFormat("MMM dd, yyyy HH:mm:ss.SSS zzz");
+    String format = "%" + df1.toPattern().length() + "s";
 
     int row = left_table.getSelectedRow();
 
@@ -394,16 +362,15 @@ public class PostGui extends JFrame implements ActionListener
 
     txt.append("Timeline for this Key block (not guaranteed to be reported in proper sequence): \n");
     if (bb.first_sector_written_tod != null)
-      txt.append(String.format("%s - 'time written' found in first bad sector: \n",
-                               df1.format(bb.first_sector_written_tod)));
+      txt.append(
+          String.format("%s - 'time written' found in first bad sector: \n", df1.format(bb.first_sector_written_tod)));
 
     if (bb.last_valid != null && bb.last_valid_rw != null)
-      txt.append(String.format("%s - Last time this Key block was %s \n",
-                               df1.format(bb.last_valid), bb.last_valid_rw));
+      txt.append(String.format("%s - Last time this Key block was %s \n", df1.format(bb.last_valid), bb.last_valid_rw));
 
     if (bb.first_dvpost_line_tod != null)
       txt.append(String.format(format + " - TOD of first 'dvpost' error found for this Key block. \n",
-                               bb.first_dvpost_line_tod + "    "));
+          bb.first_dvpost_line_tod + "    "));
 
     for (int i = 0; i < bb.raw_input.size(); i++)
       txt.append((String) bb.raw_input.get(i) + "\n");
@@ -411,17 +378,14 @@ public class PostGui extends JFrame implements ActionListener
     setAndSaveText(txt.toString());
   }
 
-
   /**
    * Automatically size the columns to the largest element.
    */
-  public void sizeColumn(int col, JTable tbl)
-  {
+  public void sizeColumn(int col, JTable tbl) {
     int largest = 0;
 
     /* Loop thru rows: */
-    for (int i = 0; i < left_model.getRowCount(); ++i)
-    {
+    for (int i = 0; i < left_model.getRowCount(); ++i) {
       String str = (String) left_model.getValueAt(i, col);
 
       /* Only store the largest size for tbl: */
@@ -431,28 +395,25 @@ public class PostGui extends JFrame implements ActionListener
 
     if (tbl.getRowCount() == 0)
       return;
-    Insets insets = ((JComponent)tbl.getCellRenderer (0, col)).getInsets();
+    Insets insets = ((JComponent) tbl.getCellRenderer(0, col)).getInsets();
 
     largest += insets.left + insets.right + 5;
-    largest  = Math.max(largest, 25);
+    largest = Math.max(largest, 25);
 
     tbl.getColumnModel().getColumn(col).setMinWidth(largest);
-    //common.ptod("size_column(): " + col + " " + largest + " " + insets.left + " " + insets.right);
+    // common.ptod("size_column(): " + col + " " + largest + " " + insets.left + " "
+    // + insets.right);
   }
-
-
 
   /**
    * Ask user for a file name to be used
    */
-  public static String askForFile(String dir, String title)
-  {
-    JFileChooser fc = new JFileChooser((new File (dir).getAbsolutePath()));
-    fc.setFileSelectionMode(JFileChooser.FILES_ONLY );
+  public static String askForFile(String dir, String title) {
+    JFileChooser fc = new JFileChooser((new File(dir).getAbsolutePath()));
+    fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
     fc.setDialogTitle(title);
 
-    if (fc.showOpenDialog(null) == fc.APPROVE_OPTION)
-    {
+    if (fc.showOpenDialog(null) == fc.APPROVE_OPTION) {
       String file = fc.getSelectedFile().getAbsolutePath();
       return file;
     }
@@ -460,42 +421,41 @@ public class PostGui extends JFrame implements ActionListener
     return null;
   }
 
-
-
 }
 
-class DVModel extends AbstractTableModel
-{
-  private String[] columns = {"sd", "lba", "key/read", "Errors"};
+class DVModel extends AbstractTableModel {
+  private String[] columns = { "sd", "lba", "key/read", "Errors" };
   private DvKeyBlock[] blocks;
 
-  public void setBlocks(DvKeyBlock[] blks)
-  {
+  public void setBlocks(DvKeyBlock[] blks) {
     blocks = blks;
   }
 
-  public DvKeyBlock getRowAt(int row)
-  {
+  public DvKeyBlock getRowAt(int row) {
     return blocks[row];
   }
-  public Object getValueAt(int row, int col)
-  {
+
+  public Object getValueAt(int row, int col) {
     DvKeyBlock bb = blocks[row];
-    if (col == 0) return bb.sd_wanted;
-    if (col == 1) return String.format("0x%08x", bb.logical_lba);
-    if (col == 2) return String.format("0x%02x/%02x", bb.key_wanted, bb.key_read);
-    else  return bb.getBlockStatusShort();
+    if (col == 0)
+      return bb.sd_wanted;
+    if (col == 1)
+      return String.format("0x%08x", bb.logical_lba);
+    if (col == 2)
+      return String.format("0x%02x/%02x", bb.key_wanted, bb.key_read);
+    else
+      return bb.getBlockStatusShort();
   }
-  public int getColumnCount()
-  {
+
+  public int getColumnCount() {
     return columns.length;
   }
-  public int getRowCount()
-  {
+
+  public int getRowCount() {
     return blocks.length;
   }
-  public String getColumnName(int col)
-  {
+
+  public String getColumnName(int col) {
     return columns[col];
   }
 }

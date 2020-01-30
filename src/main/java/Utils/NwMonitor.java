@@ -11,18 +11,14 @@ package Utils;
 import java.util.*;
 import java.text.*;
 
-
 /**
  * Very primitve network performance monitor. Built to prove that performance
  * sucks!!!!
  */
-class NwMonitor
-{
-  private final static String c =
-  "Copyright (c) 2000, 2012, Oracle and/or its affiliates. All rights reserved.";
+class NwMonitor {
+  private final static String c = "Copyright (c) 2000, 2012, Oracle and/or its affiliates. All rights reserved.";
 
-  public static void main(String[] args)
-  {
+  public static void main(String[] args) {
     if (args.length != 2)
       common.failure("Usage: NwMonitor seconds target_directory");
 
@@ -35,18 +31,15 @@ class NwMonitor
     else
       filename_for_write += "solaris";
 
-    DateFormat df = new SimpleDateFormat("EEEE, MMMM dd yyyy, HH:mm:ss.SSS" );
-
+    DateFormat df = new SimpleDateFormat("EEEE, MMMM dd yyyy, HH:mm:ss.SSS");
 
     if (args.length > 0)
       sleep = Long.parseLong(args[0]) * 1000;
 
-
     long next = System.currentTimeMillis();
-    next = (next + sleep -1 ) / sleep * sleep + 1;
+    next = (next + sleep - 1) / sleep * sleep + 1;
 
-    while (true)
-    {
+    while (true) {
       /* Write a small file and report the duration: */
       long now = System.currentTimeMillis();
       if (next - now > 1)
@@ -71,16 +64,12 @@ class NwMonitor
       end = System.currentTimeMillis();
       long ping_duration = end - start;
 
-
-      System.out.println(df.format(new Date(next)) +
-                         Format.f(" Elapsed: %7d ms;", (write_duration)) +
-                         Format.f(" Ping " + host + ": %7d ms", (ping_duration)) );
+      System.out.println(df.format(new Date(next)) + Format.f(" Elapsed: %7d ms;", (write_duration))
+          + Format.f(" Ping " + host + ": %7d ms", (ping_duration)));
 
       /* Calculate next sample time: */
       now = System.currentTimeMillis();
-      next = (now + sleep -1 ) / sleep * sleep + 1;
+      next = (now + sleep - 1) / sleep * sleep + 1;
     }
   }
 }
-
-

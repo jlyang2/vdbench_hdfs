@@ -20,61 +20,51 @@ import Vdb.common;
 /**
  * This class reads data lines from an regular or GZIP file.
  */
-public class Fget
-{
-  private final static String c =
-  "Copyright (c) 2000, 2014, Oracle and/or its affiliates. All rights reserved.";
+public class Fget {
+  private final static String c = "Copyright (c) 2000, 2014, Oracle and/or its affiliates. All rights reserved.";
 
-  private BufferedReader br          = null;
-  private File           fptr        = null;
-  private long           filesize    = 0;
-  private long           bytesread   = 0;
-  private long           early_eof   = Long.MAX_VALUE;
-  private String         fname       = null;
+  private BufferedReader br = null;
+  private File fptr = null;
+  private long filesize = 0;
+  private long bytesread = 0;
+  private long early_eof = Long.MAX_VALUE;
+  private String fname = null;
 
   static String sep = System.getProperty("file.separator");
-
 
   /**
    * Open input file name
    */
-  public Fget(String dir, String fname)
-  {
+  public Fget(String dir, String fname) {
     this(dir + sep + fname);
   }
-  public Fget(String fname_in)
-  {
+
+  public Fget(String fname_in) {
     fname = fname_in;
     if (fname.endsWith("-"))
       br = new BufferedReader(new InputStreamReader(System.in));
 
-    else
-    {
+    else {
 
       fptr = new File(fname);
-      try
-      {
+      try {
         if (fptr.getName().toLowerCase().endsWith(".gz"))
-          br = new BufferedReader(new InputStreamReader(new GZIPInputStream(new BufferedInputStream(new FileInputStream(fptr)))));
+          br = new BufferedReader(
+              new InputStreamReader(new GZIPInputStream(new BufferedInputStream(new FileInputStream(fptr)))));
         else if (fptr.getName().toLowerCase().endsWith(".jz1"))
-          br = new BufferedReader(new InputStreamReader(new GZIPInputStream(new BufferedInputStream(new FileInputStream(fptr)))));
-        else
-        {
-          if (!fname.endsWith("stdin") && !fname.endsWith("_"))
-          {
+          br = new BufferedReader(
+              new InputStreamReader(new GZIPInputStream(new BufferedInputStream(new FileInputStream(fptr)))));
+        else {
+          if (!fname.endsWith("stdin") && !fname.endsWith("_")) {
             br = new BufferedReader(new FileReader(fptr));
             filesize = fptr.length();
-          }
-          else
-          {
+          } else {
             br = new BufferedReader(new InputStreamReader(new BufferedInputStream(System.in)));
           }
         }
       }
 
-
-      catch (Exception e)
-      {
+      catch (Exception e) {
         common.failure(e);
       }
     }
@@ -83,56 +73,48 @@ public class Fget
   /**
    * Open input File pointer
    */
-  public Fget(File fin)
-  {
+  public Fget(File fin) {
 
-    try
-    {
+    try {
       fptr = fin;
       if (fptr.getName().toLowerCase().endsWith(".gz"))
-        br = new BufferedReader(new InputStreamReader(new GZIPInputStream(new BufferedInputStream(new FileInputStream(fptr)))));
+        br = new BufferedReader(
+            new InputStreamReader(new GZIPInputStream(new BufferedInputStream(new FileInputStream(fptr)))));
       else if (fptr.getName().toLowerCase().endsWith(".jz1"))
-        br = new BufferedReader(new InputStreamReader(new GZIPInputStream(new BufferedInputStream(new FileInputStream(fptr)))));
-      else
-      {
+        br = new BufferedReader(
+            new InputStreamReader(new GZIPInputStream(new BufferedInputStream(new FileInputStream(fptr)))));
+      else {
         br = new BufferedReader(new FileReader(fptr));
         filesize = fptr.length();
       }
     }
 
-    catch (Exception e)
-    {
+    catch (Exception e) {
       common.failure(e);
     }
   }
 
-  public void force_eof(long bytes)
-  {
+  public void force_eof(long bytes) {
     early_eof = bytes;
   }
 
-
-  public String getName()
-  {
+  public String getName() {
     return fname;
   }
 
-  public static boolean fileRename(String parent, String oldname, String newname)
-  {
-    File oldf = new File(parent,oldname);
-    File newf = new File(parent,newname);
+  public static boolean fileRename(String parent, String oldname, String newname) {
+    File oldf = new File(parent, oldname);
+    File newf = new File(parent, newname);
     boolean ret = oldf.renameTo(newf);
     if (!ret)
       common.ptod("Fget.fileRename(): rename failed. " + oldf.getName() + " ===> " + newf.getName());
     return ret;
   }
 
-
   /**
    * Place a separator at the end of a directory name.
    */
-  public static String separator(String dir)
-  {
+  public static String separator(String dir) {
     /* Accept either an existing unix or windows separator: */
     if (!dir.endsWith("/") && !dir.endsWith("\\"))
       dir += sep;
@@ -142,17 +124,14 @@ public class Fget
   /**
    * Return one line from input file
    */
-  public String get()
-  {
+  public String get() {
     /* Already EOF? */
     if (br == null)
       return null;
 
-    try
-    {
+    try {
       String line = br.readLine();
-      if (line == null)
-      {
+      if (line == null) {
         close();
         return null;
       }
@@ -161,8 +140,7 @@ public class Fget
       return line;
     }
 
-    catch (Exception e)
-    {
+    catch (Exception e) {
       e.printStackTrace();
       common.ptod("Exception with file name: " + getName());
       common.failure(e);
@@ -170,18 +148,15 @@ public class Fget
     return null;
   }
 
-  public String getNoEof()
-  {
+  public String getNoEof() {
     /* Already EOF? */
-    //if (br == null)
-    //  return null;
+    // if (br == null)
+    // return null;
 
-    try
-    {
+    try {
       String line = br.readLine();
-      if (line == null)
-      {
-        //close();
+      if (line == null) {
+        // close();
         return null;
       }
 
@@ -189,8 +164,7 @@ public class Fget
       return line;
     }
 
-    catch (Exception e)
-    {
+    catch (Exception e) {
       e.printStackTrace();
       common.ptod("Exception with file name: " + getName());
       common.failure(e);
@@ -198,70 +172,63 @@ public class Fget
     return null;
   }
 
-
   /**
    * Service routine to help read a (not too huge) flatfile into memory.
    */
-  public static Vector read_file_to_vector(String parent, String filename)
-  {
+  public static Vector read_file_to_vector(String parent, String filename) {
     return readTextFile(new File(parent, filename));
   }
-  public static Vector read_file_to_vector(String filename)
-  {
+
+  public static Vector read_file_to_vector(String filename) {
     return readTextFile(new File(filename));
   }
-  public static String[] readFileToArray(String dir, String filename)
-  {
-    Vector <String> lines = readFile(dir, filename);
-    if (lines == null)
-      return null;
-    return lines.toArray(new String[0]);
-  }
-  public static String[] readFileToArray(String filename)
-  {
-    Vector <String> lines = readFile(filename);
-    if (lines == null)
-      return null;
-    return lines.toArray(new String[0]);
-  }
-  private static String[] obsolete_readFileToArray(File fptr)
-  {
-    Vector <String> lines = readTextFile(fptr);
+
+  public static String[] readFileToArray(String dir, String filename) {
+    Vector<String> lines = readFile(dir, filename);
     if (lines == null)
       return null;
     return lines.toArray(new String[0]);
   }
 
+  public static String[] readFileToArray(String filename) {
+    Vector<String> lines = readFile(filename);
+    if (lines == null)
+      return null;
+    return lines.toArray(new String[0]);
+  }
 
-  private static Vector <String> readFile(String fname)
-  {
+  private static String[] obsolete_readFileToArray(File fptr) {
+    Vector<String> lines = readTextFile(fptr);
+    if (lines == null)
+      return null;
+    return lines.toArray(new String[0]);
+  }
+
+  private static Vector<String> readFile(String fname) {
     if (fname.startsWith("http://"))
       return readTextUrl(fname);
     else
       return readTextFile(new File(fname));
   }
-  private static Vector <String> readFile(String dir, String fname)
-  {
+
+  private static Vector<String> readFile(String dir, String fname) {
     if (dir.startsWith("http://"))
       return readTextUrl(dir, fname);
     else
       return readTextFile(new File(dir, fname));
   }
 
-  private static Vector <String> readTextFile(File fptr)
-  {
-    Vector output = new Vector(64,0);
-    if (!fptr.exists())
-    {
-      //common.plog("readFile(): file not found: " + fptr.getAbsolutePath());
+  private static Vector<String> readTextFile(File fptr) {
+    Vector output = new Vector(64, 0);
+    if (!fptr.exists()) {
+      // common.plog("readFile(): file not found: " + fptr.getAbsolutePath());
       return null;
     }
 
     Fget fg = new Fget(fptr);
 
     /* Read all lines and store in vector: */
-    while (true)
-    {
+    while (true) {
       String line = fg.get();
       if (line == null)
         break;
@@ -272,22 +239,19 @@ public class Fget
     return output;
   }
 
-
-  public static Vector <String> readTextUrl(String http, String file)
-  {
+  public static Vector<String> readTextUrl(String http, String file) {
     if (http.endsWith("/"))
       return readTextUrl(http + file);
     else
       return readTextUrl(http + "/" + file);
   }
-  public static Vector <String> readTextUrl(String http)
-  {
-    //common.ptod("http: " + http);
-    Vector <String> lines = new Vector(64);
-    try
-    {
-      URL            url = new URL(http);
-      BufferedReader in  = new BufferedReader(new InputStreamReader(url.openStream()));
+
+  public static Vector<String> readTextUrl(String http) {
+    // common.ptod("http: " + http);
+    Vector<String> lines = new Vector(64);
+    try {
+      URL url = new URL(http);
+      BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
 
       String inputLine;
       while ((inputLine = in.readLine()) != null)
@@ -295,50 +259,38 @@ public class Fget
       in.close();
     }
 
-    catch (Exception e)
-    {
-      //common.ptod(e);
+    catch (Exception e) {
+      // common.ptod(e);
       return null;
     }
 
     return lines;
   }
 
-  public String pct_read()
-  {
+  public String pct_read() {
     if (filesize == 0)
       return "n/a";
     return Format.f("%3d", bytesread * 100 / filesize);
   }
 
-  public String get_parent()
-  {
+  public String get_parent() {
     return fptr.getAbsoluteFile().getParent();
   }
 
-
-  public static String get_parent(String fname)
-  {
+  public static String get_parent(String fname) {
     return new File(fname).getAbsoluteFile().getParent() + sep;
   }
 
+  public void close() {
+    // common.ptod("fget.close(): ");
+    // Thread.currentThread().dumpStack();
 
-  public void close()
-  {
-    //common.ptod("fget.close(): ");
-    //Thread.currentThread().dumpStack();
-
-
-    try
-    {
-      if (br != null)
-      {
+    try {
+      if (br != null) {
         br.close();
         br = null;
       }
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       common.failure(e);
     }
   }
@@ -346,15 +298,14 @@ public class Fget
   /**
    * Check for existence of directory
    */
-  public static boolean dir_exists(String dirname)
-  {
+  public static boolean dir_exists(String dirname) {
     File dir = new File(dirname);
     if (!dir.exists())
       return false;
     return dir.isDirectory();
   }
-  public static boolean dir_exists(String parent, String dirname)
-  {
+
+  public static boolean dir_exists(String parent, String dirname) {
     File dir = new File(parent, dirname);
     if (!dir.exists())
       return false;
@@ -362,49 +313,38 @@ public class Fget
   }
 
   /**
-   * Check to see if a file exists.
-   * If the file exists, but it is a directory name, return false.
+   * Check to see if a file exists. If the file exists, but it is a directory
+   * name, return false.
    */
-  public static boolean file_exists(String parent, String fname)
-  {
-    //if (!parent.endsWith(sep))
-    //  common.failure("Directory name not terminated by a separator: " + parent);
+  public static boolean file_exists(String parent, String fname) {
+    // if (!parent.endsWith(sep))
+    // common.failure("Directory name not terminated by a separator: " + parent);
 
     boolean ret = new File(parent, fname).exists();
     if (ret)
       return (!dir_exists(parent, fname));
     return ret;
   }
-  public static boolean file_exists(String fname)
-  {
+
+  public static boolean file_exists(String fname) {
     boolean ret = new File(fname).exists();
     if (ret)
       return (!dir_exists(fname));
     return ret;
   }
 
-
-  public static void file_delete(String fname)
-  {
+  public static void file_delete(String fname) {
     new File(fname).delete();
   }
-  public static void file_delete(String dir, String fname)
-  {
+
+  public static void file_delete(String dir, String fname) {
     new File(dir, fname).delete();
   }
 
-
-
-
-  public static void main(String[] args)
-  {
+  public static void main(String[] args) {
     String http = "http://sbm-240a.us.oracle.com/shares/export/spp/87micro10/spp02/nfsv3_sbt-fill/output004/summary.html";
     String[] lines = readFileToArray(http);
     common.ptod("lines: " + lines.length);
   }
 
 }
-
-
-
-

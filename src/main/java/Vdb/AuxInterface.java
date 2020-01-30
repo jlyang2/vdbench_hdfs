@@ -1,23 +1,22 @@
 package Vdb;
-    
+
 /*  
  * Copyright (c) 2000, 2012, Oracle and/or its affiliates. All rights reserved. 
- */ 
-    
+ */
+
 /*  
  * Author: Henk Vandenbergh. 
- */ 
+ */
 
 import Vdb.common;
 
 /**
  * The objective of this interface is in its first phase to allow any
- * reportClass to decide whether the Vdbench warmup should complete.
- * With that, user can return some String values to be printed on file
- * summary.html at the end of the line.
+ * reportClass to decide whether the Vdbench warmup should complete. With that,
+ * user can return some String values to be printed on file summary.html at the
+ * end of the line.
  */
-public interface AuxInterface
-{
+public interface AuxInterface {
 
   /**
    * Parse parameters provided by Vdbench.
@@ -42,12 +41,12 @@ public interface AuxInterface
   /**
    * Receive a String that needs to be used as report header in report.html
    */
-  //public String[] getReportHeader();
+  // public String[] getReportHeader();
 
   /**
    * Receive a String that contains data to be reported in report.html
    */
-  //public String getReportData();
+  // public String getReportData();
 
   /**
    * Work is starting. Prepare for data collection

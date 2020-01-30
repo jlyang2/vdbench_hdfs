@@ -15,74 +15,63 @@ import Utils.OS_cmd;
 
 import Vdb.common;
 
-
 /**
- * Auxilary reporting add-on for Vdbench.
- * On Linux this reports current memory usage as received from /proc/meminfo.
- * And of course, only on the system where the vdbench Master is running.
+ * Auxilary reporting add-on for Vdbench. On Linux this reports current memory
+ * usage as received from /proc/meminfo. And of course, only on the system where
+ * the vdbench Master is running.
  */
-public class FreeMem extends AuxReport
-{
-  private final static String c =
-  "Copyright (c) 2000, 2012, Oracle and/or its affiliates. All rights reserved.";
+public class FreeMem extends AuxReport {
+  private final static String c = "Copyright (c) 2000, 2012, Oracle and/or its affiliates. All rights reserved.";
 
-  private String[] parms    = null;
+  private String[] parms = null;
 
-  private boolean disabled  = false;
+  private boolean disabled = false;
 
-  private OS_cmd  ocmd      = null;
-
+  private OS_cmd ocmd = null;
 
   /**
    * Parse parameters provided by Vdbench.
    */
-  public void parseParameters(String[] parms)
-  {
+  public void parseParameters(String[] parms) {
     this.parms = parms;
   }
 
   /**
    * Receive run time information.
    */
-  public void storeRunInfo(int warmup, int elapsed, int interval)
-  {
+  public void storeRunInfo(int warmup, int elapsed, int interval) {
     common.where();
   }
 
   /**
    * Receive a String that needs to be used as report header in summary.html
    */
-  public String[] getSummaryHeaders()
-  {
+  public String[] getSummaryHeaders() {
     String[] headers = new String[2];
-    headers[0] = String.format("%8s ", "MemFree" );
-    headers[1] = String.format("%8s ", "gb"      );
+    headers[0] = String.format("%8s ", "MemFree");
+    headers[1] = String.format("%8s ", "gb");
     return headers;
   }
 
   /**
    * Receive a String that contains data to be reported in summary.html
    */
-  public String getSummaryData()
-  {
+  public String getSummaryData() {
     if (disabled)
       return "disabled";
 
-    if (free_bytes >= 0)
-    {
-      String txt = String.format("%8.3f ", free_bytes / (1024*1024*1024.));
+    if (free_bytes >= 0) {
+      String txt = String.format("%8.3f ", free_bytes / (1024 * 1024 * 1024.));
       return txt;
     }
 
     return String.format("%8s", "n/a");
   }
 
-
   /**
    * Receive a String that needs to be used as report header in report.html
    */
-  public String[] getReportHeader()
-  {
+  public String[] getReportHeader() {
     common.where();
     return null;
   }
@@ -90,8 +79,7 @@ public class FreeMem extends AuxReport
   /**
    * Receive a String that contains data to be reported in report.html
    */
-  public String getReportData()
-  {
+  public String getReportData() {
     common.where();
     return null;
   }
@@ -99,36 +87,33 @@ public class FreeMem extends AuxReport
   /**
    * Work is starting. Prepare for data collection
    */
-  public void runStart()
-  {
+  public void runStart() {
     common.where();
   }
 
   /**
-   * Collect all data that you will need for a reporting interval.
-   * Note: it is technically possible for this method to not be finished until
-   * AFTER the statistics have been reported.
-   * This means that the statistics as reported by a call to getSummaryData()
-   * can be stale.
+   * Collect all data that you will need for a reporting interval. Note: it is
+   * technically possible for this method to not be finished until AFTER the
+   * statistics have been reported. This means that the statistics as reported by
+   * a call to getSummaryData() can be stale.
    *
    * The statistics reporting will NOT be delayed by Aux statistics.
    */
   private static double free_bytes = -1;
-  public void collectIntervalData()
-  {
+
+  public void collectIntervalData() {
     if (disabled)
       return;
 
-    /* Do NOT clear stats: this way when we run behind we just reuse PREVIOUS stats. */
-    //free_bytes = -1;
+    /*
+     * Do NOT clear stats: this way when we run behind we just reuse PREVIOUS stats.
+     */
+    // free_bytes = -1;
 
-    try
-    {
-      if (common.onLinux())
-      {
+    try {
+      if (common.onLinux()) {
         String[] lines = Fget.readFileToArray("/proc/meminfo");
-        for (String line : lines)
-        {
+        for (String line : lines) {
           if (!line.startsWith("MemFree"))
             continue;
 
@@ -138,11 +123,9 @@ public class FreeMem extends AuxReport
         }
       }
 
-      if (common.onSolaris())
-      {
+      if (common.onSolaris()) {
         /* Are we running behind? ignore request: */
-        if (ocmd != null)
-        {
+        if (ocmd != null) {
           common.ptod("FreeMem auxiliarly reporting is running behind. Request ignored.");
           return;
         }
@@ -155,9 +138,8 @@ public class FreeMem extends AuxReport
 
         String[] lines = ocmd.getStdout();
         ocmd = null;
-        for (String line : lines)
-        {
-          //common.ptod("line: " + line);
+        for (String line : lines) {
+          // common.ptod("line: " + line);
           if (!line.startsWith("unix:0:system_pages:freemem"))
             continue;
 
@@ -177,12 +159,10 @@ public class FreeMem extends AuxReport
       return;
     }
 
-    catch (Exception e)
-    {
+    catch (Exception e) {
       common.ptod("FreeMem auxiliarly reporting is being disabled.");
       common.ptod(e);
       disabled = true;
     }
   }
 }
-

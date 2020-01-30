@@ -1,19 +1,18 @@
 package User;
-    
+
 /*  
  * Copyright (c) 2000, 2012, Oracle and/or its affiliates. All rights reserved. 
- */ 
-    
+ */
+
 /*  
  * Author: Henk Vandenbergh. 
- */ 
+ */
 
 import Vdb.Cmd_entry;
 import Vdb.SlaveJvm;
 import Vdb.common;
 
-public interface UserInterface
-{
+public interface UserInterface {
 
   /**
    * Parse the input parameters specified in the parameter file.
@@ -29,8 +28,8 @@ public interface UserInterface
   public boolean parser(String[] parms);
 
   /**
-   * Preparation for the generation of a workload.
-   * Called once per WD/SD pair per run.
+   * Preparation for the generation of a workload. Called once per WD/SD pair per
+   * run.
    */
   public UserDeviceInfo initialize(WorkloadInfo wi);
 
@@ -50,6 +49,7 @@ public interface UserInterface
   public boolean postIO(UserCmd ucmd);
 
   public WorkloadInfo getWorkloadInfo();
+
   public void setWorkloadInfo(WorkloadInfo wi);
 
   /**
@@ -67,6 +67,7 @@ public interface UserInterface
   public Object getSharedLock();
 
   public void setSharedObject(Object s);
+
   public Object getSharedObject();
 
   public Object[] getDeviceList();

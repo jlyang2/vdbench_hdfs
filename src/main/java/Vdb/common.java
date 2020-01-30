@@ -20,20 +20,14 @@ import java.util.*;
 
 import Utils.*;
 
-
-
-
 /**
-  * The common class contains some general service methods
-  *
-  * Warning: some calls from code in the Utils package to similary named methods
-  * here will NOT actually use the code below!
-  * Need to prevent that some day.
-  */
-public class common
-{
-  private final static String c =
-  "Copyright (c) 2000, 2016, Oracle and/or its affiliates. All rights reserved.";
+ * The common class contains some general service methods
+ *
+ * Warning: some calls from code in the Utils package to similary named methods
+ * here will NOT actually use the code below! Need to prevent that some day.
+ */
+public class common {
+  private final static String c = "Copyright (c) 2000, 2016, Oracle and/or its affiliates. All rights reserved.";
 
   static PrintWriter stdout;
 
@@ -56,135 +50,134 @@ public class common
 
   /* Debugging flags. The settings are done in Utils.common() */
 
-  public static int NEVER_OPEN_FOR_WRITE  = 1;
+  public static int NEVER_OPEN_FOR_WRITE = 1;
 
-  public static int PRINT_MEMORY          = 3;
-  public static int NO_PRINT_FLUSH        = 4;
+  public static int PRINT_MEMORY = 3;
+  public static int NO_PRINT_FLUSH = 4;
 
-  public static int DEVXLATE              = 6;
-  public static int PRINT_BLOCK_COUNTERS  = 7;
-  public static int FIXED_SEED            = 8;    // Sent out to Zadarastorage
-  public static int REUSE_IOSTAT          = 9;
-  public static int PRINT_SIZES           = 10;
-  public static int FAST_HEADERS          = 11;
+  public static int DEVXLATE = 6;
+  public static int PRINT_BLOCK_COUNTERS = 7;
+  public static int FIXED_SEED = 8; // Sent out to Zadarastorage
+  public static int REUSE_IOSTAT = 9;
+  public static int PRINT_SIZES = 10;
+  public static int FAST_HEADERS = 11;
 
-  public static int TIMERS                = 13;
-  public static int PRINT_OPEN_FLAGS      = 14;
-  public static int PRINT_IO_COMP         = 15;
-  public static int EXTERNAL_SYNCH        = 16;
-  public static int NO_KSTAT              = 17;
-  public static int NO_CONFIG_SCRIPT      = 18;
-  public static int NO_CPU_STATS          = 19;
-  public static int SPIN                  = 20;   /* set hires_tick=1 works just as well */
-  public static int PTOD_TO_DISK          = 21;
+  public static int TIMERS = 13;
+  public static int PRINT_OPEN_FLAGS = 14;
+  public static int PRINT_IO_COMP = 15;
+  public static int EXTERNAL_SYNCH = 16;
+  public static int NO_KSTAT = 17;
+  public static int NO_CONFIG_SCRIPT = 18;
+  public static int NO_CPU_STATS = 19;
+  public static int SPIN = 20; /* set hires_tick=1 works just as well */
+  public static int PTOD_TO_DISK = 21;
 
   public static int PRINT_IN_MICROSECONDS = 23;
 
   public static int IGNORE_MISSING_REPLAY = 24;
 
-  public static int LONGER_HEARTBEAT      = 27;   // -d27 is documented in blog!
-  public static int SHORTER_HEARTBEAT     = 28;
-  public static int FILEENTRY_SET_BUSY    = 29;
+  public static int LONGER_HEARTBEAT = 27; // -d27 is documented in blog!
+  public static int SHORTER_HEARTBEAT = 28;
+  public static int FILEENTRY_SET_BUSY = 29;
 
-  public static int DEBUG_COMPRESSION     = 31;
-  public static int DIRECTORY_SET_BUSY    = 32;
-  public static int DIRECTORY_CREATED     = 33;
+  public static int DEBUG_COMPRESSION = 31;
+  public static int DIRECTORY_SET_BUSY = 32;
+  public static int DIRECTORY_CREATED = 33;
 
-  public static int REPORT_CREATES        = 35;
-  public static int FAST_SYNCTIME         = 36;
-  public static int FAST_BLOCK_KILL       = 37;
-  public static int USE_FORMAT_RATE       = 38;
-  public static int FORCE_REPLAY_SPLIT    = 39;
-  public static int FORCE_KSTAT_ERROR     = 40;
-  public static int SCSI_RESET_AT_START   = 41;
-  public static int SCSI_RESET_ALL_START  = 42;
-  public static int SOCKET_TRAFFIC        = 43;
-  public static int SLAVE_LOG_ON_CONSOLE  = 44;   // does not work with Vdbench RSH!!!
-  public static int THREADCONTROL_LOG     = 45;
-  public static int DUMP_THREAD_TRACE     = 46;
-  public static int SHOW_REPORTS          = 47;
-  public static int SHOW_SOCKET_MESSAGES  = 48;
-  public static int SMALL_FILE_COUNT      = 49;
-  public static int PRINT_FS_COUNTERS     = 50;
-  public static int FAKE_LIBDEV           = 51;
-  public static int CONCAT_ALLOW_WRITE    = 52;
+  public static int REPORT_CREATES = 35;
+  public static int FAST_SYNCTIME = 36;
+  public static int FAST_BLOCK_KILL = 37;
+  public static int USE_FORMAT_RATE = 38;
+  public static int FORCE_REPLAY_SPLIT = 39;
+  public static int FORCE_KSTAT_ERROR = 40;
+  public static int SCSI_RESET_AT_START = 41;
+  public static int SCSI_RESET_ALL_START = 42;
+  public static int SOCKET_TRAFFIC = 43;
+  public static int SLAVE_LOG_ON_CONSOLE = 44; // does not work with Vdbench RSH!!!
+  public static int THREADCONTROL_LOG = 45;
+  public static int DUMP_THREAD_TRACE = 46;
+  public static int SHOW_REPORTS = 47;
+  public static int SHOW_SOCKET_MESSAGES = 48;
+  public static int SMALL_FILE_COUNT = 49;
+  public static int PRINT_FS_COUNTERS = 50;
+  public static int FAKE_LIBDEV = 51;
+  public static int CONCAT_ALLOW_WRITE = 52;
   public static int NO_CONTROLFILE_DETAIL = 53;
-  public static int SEQUENTIAL_COUNTS     = 54;
+  public static int SEQUENTIAL_COUNTS = 54;
 
-  public static int RESTART_FILLING       = 56;
-  public static int FORCE_SHUTDOWN        = 57;
-  public static int LONG_SHUTDOWN         = 58;
-  public static int ANCHOR_FIXED_SEED     = 59;
-  public static int FIFO_STATS            = 60;
+  public static int RESTART_FILLING = 56;
+  public static int FORCE_SHUTDOWN = 57;
+  public static int LONG_SHUTDOWN = 58;
+  public static int ANCHOR_FIXED_SEED = 59;
+  public static int FIFO_STATS = 60;
 
-  public static int ALLOW_BLOCK0_ACCESS   = 62;
-  public static int NO_BLOCK0_ACCESS      = 63;
+  public static int ALLOW_BLOCK0_ACCESS = 62;
+  public static int NO_BLOCK0_ACCESS = 63;
 
-  public static int cant_use_64           = 64;   // treated as 64bit request by java!!
-  public static int HOLD_UP_STATISTICS    = 65;
+  public static int cant_use_64 = 64; // treated as 64bit request by java!!
+  public static int HOLD_UP_STATISTICS = 65;
 
-  public static int DV_ALLOW_PATTERN      = 67;
-  public static int SIMULATE              = 68;
-  public static int ASSUME_FILE_EXISTS    = 69;
-  public static int SKEW_ON_CONSOLE       = 70;
-  public static int DETAIL_SLV_REPORT     = 71;
-  public static int GENERATE_WORK_INFO    = 72;
-  public static int USE_PSRSET            = 73;
+  public static int DV_ALLOW_PATTERN = 67;
+  public static int SIMULATE = 68;
+  public static int ASSUME_FILE_EXISTS = 69;
+  public static int SKEW_ON_CONSOLE = 70;
+  public static int DETAIL_SLV_REPORT = 71;
+  public static int GENERATE_WORK_INFO = 72;
+  public static int USE_PSRSET = 73;
 
-  public static int USE_TVDBENCH          = 75;
-  public static int USE_ANY_JAVA          = 76;
-  public static int DEBUG_SPREAD          = 77;
-  public static int NATIVE_SLEEP          = 78;
-  public static int PRINT_SPREAD          = 79;
-  public static int PTOD_WG_STUFF         = 80;
-  public static int PLOG_WG_STUFF         = 81;
-  public static int RUN_JMAP              = 82;
-  public static int SHORT_FS_STDOUT       = 83;
-  public static int TIMEBEGINPERIOD       = 84;  // for Windows
-  public static int DEBUG_AUX_REPORT      = 85;
-  public static int FILE_FORMAT_TRUNCATE  = 86;
-  public static int WT_TASK_LIST_SORT     = 87;
+  public static int USE_TVDBENCH = 75;
+  public static int USE_ANY_JAVA = 76;
+  public static int DEBUG_SPREAD = 77;
+  public static int NATIVE_SLEEP = 78;
+  public static int PRINT_SPREAD = 79;
+  public static int PTOD_WG_STUFF = 80;
+  public static int PLOG_WG_STUFF = 81;
+  public static int RUN_JMAP = 82;
+  public static int SHORT_FS_STDOUT = 83;
+  public static int TIMEBEGINPERIOD = 84; // for Windows
+  public static int DEBUG_AUX_REPORT = 85;
+  public static int FILE_FORMAT_TRUNCATE = 86;
+  public static int WT_TASK_LIST_SORT = 87;
 
-  public static int REPORT_MESSAGE_SIZE   = 89;
-  public static int GCTRACKER             = 90;
+  public static int REPORT_MESSAGE_SIZE = 89;
+  public static int GCTRACKER = 90;
 
-  public static int NO_ERROR_ABORT        = 96;
-  public static int ALWAYS_ERASE_MAPS     = 97;
-  public static int NO_MISSING_SUB_CHECK  = 98;
-  public static int IGNORE_PARM_COMMENT   = 99;
+  public static int NO_ERROR_ABORT = 96;
+  public static int ALWAYS_ERASE_MAPS = 97;
+  public static int NO_MISSING_SUB_CHECK = 98;
+  public static int IGNORE_PARM_COMMENT = 99;
 
   public static int USE_TMP_SHARED_LIBRARY = 100;
-  public static int OPREAD_SLEEP           = 101;
+  public static int OPREAD_SLEEP = 101;
 
-  public static int DONT_DUMP_MAPS         = 102;
-  public static int NO_RESPONSE_TIMES      = 103;
+  public static int DONT_DUMP_MAPS = 102;
+  public static int NO_RESPONSE_TIMES = 103;
 
-  public static int CREATE_FILE_LIST       = 106;
-  public static int FIXED_HOTBAND_SEED     = 107;
-  public static int CREATE_READ_WRITE_LOG  = 108;
-  public static int PRINT_WIDE_WHERE       = 109;
+  public static int CREATE_FILE_LIST = 106;
+  public static int FIXED_HOTBAND_SEED = 107;
+  public static int CREATE_READ_WRITE_LOG = 108;
+  public static int PRINT_WIDE_WHERE = 109;
 
-  public static int FAST_JOURNAL_CHECK     = 110;  // obsolete
-  public static int JOURNAL_ADD_TIMESTAMP  = 111;
+  public static int FAST_JOURNAL_CHECK = 110; // obsolete
+  public static int JOURNAL_ADD_TIMESTAMP = 111;
 
-  public static int THREAD_MONITOR_ALL     = 120;
-  public static int THREAD_MONITOR_TOP10   = 121;
-  public static int THREAD_MONITOR_CONSOLE = 122;  // implies top10
+  public static int THREAD_MONITOR_ALL = 120;
+  public static int THREAD_MONITOR_TOP10 = 121;
+  public static int THREAD_MONITOR_CONSOLE = 122; // implies top10
 
-  public static int FAKE_RSH               = 124;
-  public static int FAKE_TRACE_BEFORE      = 125;
-  public static int FSYNC_AFTER_WRITE      = 126;
-  public static int IGNORE_CHECKSUM        = 127;
-  public static int BYPASS_FWGWAITER       = 128;
-  public static int REPORT_FWG_PERMITS     = 129;
+  public static int FAKE_RSH = 124;
+  public static int FAKE_TRACE_BEFORE = 125;
+  public static int FSYNC_AFTER_WRITE = 126;
+  public static int IGNORE_CHECKSUM = 127;
+  public static int BYPASS_FWGWAITER = 128;
+  public static int REPORT_FWG_PERMITS = 129;
 
-  public static int DV_PRINT_SECTOR_IMMED  = 131;
-  public static int DONT_ZIP_SOCKET_MSGS   = 132;
-  public static int PRINT_FILE_IO          = 133;
+  public static int DV_PRINT_SECTOR_IMMED = 131;
+  public static int DONT_ZIP_SOCKET_MSGS = 132;
+  public static int PRINT_FILE_IO = 133;
 
-  private static String shared_library_dir = null;   /* Directory with shared library */
+  private static String shared_library_dir = null; /* Directory with shared library */
   private static boolean arch_64_bit = false;
-
 
   private static boolean solaris;
   private static boolean windows;
@@ -194,58 +187,52 @@ public class common
   private static boolean linux;
   private static boolean mac;
 
-  static
-  {
-    solaris = (System.getProperty("os.name").toLowerCase().startsWith("sunos") ||
-               System.getProperty("os.name").toLowerCase().startsWith("solaris"));
+  static {
+    solaris = (System.getProperty("os.name").toLowerCase().startsWith("sunos")
+        || System.getProperty("os.name").toLowerCase().startsWith("solaris"));
 
     windows = (System.getProperty("os.name").toLowerCase().startsWith("windows"));
 
-    zlinux  = (System.getProperty("os.name").toLowerCase().startsWith("linux") &&
-               System.getProperty("os.arch").startsWith("s390"));
+    zlinux = (System.getProperty("os.name").toLowerCase().startsWith("linux")
+        && System.getProperty("os.arch").startsWith("s390"));
 
-    aix     = (System.getProperty("os.name").toLowerCase().startsWith("aix"));
+    aix = (System.getProperty("os.name").toLowerCase().startsWith("aix"));
 
-    hp      = (System.getProperty("os.name").toLowerCase().startsWith("hp-ux"));
+    hp = (System.getProperty("os.name").toLowerCase().startsWith("hp-ux"));
 
-    linux   = (System.getProperty("os.name").toLowerCase().startsWith("linux") ||
-               System.getProperty("os.name").toLowerCase().startsWith("freebsd"));
+    linux = (System.getProperty("os.name").toLowerCase().startsWith("linux")
+        || System.getProperty("os.name").toLowerCase().startsWith("freebsd"));
 
-    mac     = (System.getProperty("os.name").toLowerCase().startsWith("mac"));
+    mac = (System.getProperty("os.name").toLowerCase().startsWith("mac"));
   }
 
-
   /**
-   * We need to blow up this program because of a fatal error.
-   * We always keep some spare memory around to help us clean up!
+   * We need to blow up this program because of a fatal error. We always keep some
+   * spare memory around to help us clean up!
    */
-  static byte[] spare_memory = new byte[8*1024*1024];
+  static byte[] spare_memory = new byte[8 * 1024 * 1024];
+
   /**
    * Terminate run. A message text is displayed.
    *
    * Forcing two locks to make sure that if we get an other failure we already
-   * have this lock. This forces failure_lock and ptod_lock to be obtained in
-   * the same order, preventing dead locks.
+   * have this lock. This forces failure_lock and ptod_lock to be obtained in the
+   * same order, preventing dead locks.
    */
-  public static void failure(Exception e)
-  {
+  public static void failure(Exception e) {
     Ctrl_c.removeShutdownHook();
-    synchronized(ptod_lock)
-    {
-      synchronized(failure_lock)
-      {
+    synchronized (ptod_lock) {
+      synchronized (failure_lock) {
         if (spare_memory != null)
           spare_memory = null;
-        else
-        {
+        else {
           common.ptod("common.failure(): System.exit(-99)");
           common.where(8);
           exit(-99);
         }
 
         /* Give slaves a bity of time to clean up: */
-        if (!SlaveJvm.isThisSlave())
-        {
+        if (!SlaveJvm.isThisSlave()) {
           SlaveList.sendWorkloadDone();
           common.sleep_some(500);
           SlaveList.shutdownAllSlaves();
@@ -267,7 +254,7 @@ public class common
         if (common.log_html != null)
           e.printStackTrace(common.log_html);
 
-        //Ctrl_c.removeShutdownHook();
+        // Ctrl_c.removeShutdownHook();
 
         if (SlaveJvm.isFirstSlaveOnHost())
           Adm_msgs.copy_varadmmsgs();
@@ -279,8 +266,8 @@ public class common
         /* Before we go further: see if an 'end_cmd' must be run: */
         /* We're already in trouble: don't make it worse: */
         /* (removed while doing 'pdm start') */
-        //if (!Vdbmain.simulate)
-        //  Debug_cmds.ending_command.run_command();
+        // if (!Vdbmain.simulate)
+        // Debug_cmds.ending_command.run_command();
       }
 
       /* Exit must be outside of the lock: */
@@ -288,32 +275,26 @@ public class common
     }
   }
 
-
   /**
    * Terminate run. A message text is displayed.
    */
-  public static void failure(String format, Object ... args)
-  {
-    failure(String.format(format,args));
+  public static void failure(String format, Object... args) {
+    failure(String.format(format, args));
   }
-  public static void failure(String txt)
-  {
+
+  public static void failure(String txt) {
     Ctrl_c.removeShutdownHook();
-    synchronized(ptod_lock)
-    {
-      synchronized(failure_lock)
-      {
+    synchronized (ptod_lock) {
+      synchronized (failure_lock) {
         if (spare_memory != null)
           spare_memory = null;
-        else
-        {
+        else {
           common.ptod("common.failure(): System.exit(-99)");
           exit(-99);
         }
 
         /* Give slaves a bity of time to clean up: */
-        if (!SlaveJvm.isThisSlave())
-        {
+        if (!SlaveJvm.isThisSlave()) {
           SlaveList.sendWorkloadDone();
           common.sleep_some(500);
           SlaveList.shutdownAllSlaves();
@@ -327,15 +308,13 @@ public class common
           SlaveJvm.setWorkloadDone(true);
 
         /* Allow for proper multi-line error text. First single line: */
-        if (txt.indexOf("\n") == -1)
-        {
+        if (txt.indexOf("\n") == -1) {
           common.ptod("");
           common.ptod(txt);
           common.ptod("");
         }
 
-        else
-        {
+        else {
           common.ptod("");
           StringTokenizer st = new StringTokenizer(txt, "\n");
           while (st.hasMoreTokens())
@@ -346,18 +325,17 @@ public class common
         if (get_debug(DIRECTORY_CREATED))
           FileAnchor.printAnchorStatus();
 
-
         Throwable t = new RuntimeException(txt);
 
         /* stderr from the slaves gets mixed in with whatever stdout data has */
-        /* just been written, so for slaves stdout, for master stderr:        */
-        t.printStackTrace( (SlaveJvm.isThisSlave()) ? System.out : System.err);
+        /* just been written, so for slaves stdout, for master stderr: */
+        t.printStackTrace((SlaveJvm.isThisSlave()) ? System.out : System.err);
 
         /* Since we just went to stderr, make sure that log_html is not stdout: */
         if (common.log_html != null && common.log_html != stdout)
           t.printStackTrace(common.log_html);
 
-        //Ctrl_c.removeShutdownHook();
+        // Ctrl_c.removeShutdownHook();
 
         if (SlaveJvm.isFirstSlaveOnHost())
           Adm_msgs.copy_varadmmsgs();
@@ -370,13 +348,13 @@ public class common
         /* Before we go further: see if an 'end_cmd' must be run: */
         /* We're already in trouble: don't make it worse: */
         /* (removed while doing 'pdm start') */
-        //if (!Vdbmain.simulate)
-        //  Debug_cmds.ending_command.run_command();
+        // if (!Vdbmain.simulate)
+        // Debug_cmds.ending_command.run_command();
 
-        /* Before we call System.exit() sleep for one second.  */
-        /* This is done to allow the master to receive outstanding  */
-        /* messages from a slave before the slave goes away.        */
-        /* Without the master may get an EOFException from the socket   */
+        /* Before we call System.exit() sleep for one second. */
+        /* This is done to allow the master to receive outstanding */
+        /* messages from a slave before the slave goes away. */
+        /* Without the master may get an EOFException from the socket */
         /* Before it gets the chance to pick up the latest messages. */
         common.sleep_some(1000);
       }
@@ -386,21 +364,19 @@ public class common
     }
   }
 
-
   /**
    * Preferred method to shut down a JVM.
    *
    *
    */
-  public static void exit(int rc)
-  {
+  public static void exit(int rc) {
     Ctrl_c.removeShutdownHook();
     OS_cmd.killAll();
     FileAnchor.closeAllLogs();
     SD_entry.closeAllLogs();
 
-    //common.ptod("common.exit(): " + rc);
-    //System.out.println("common.exit(): " + rc);
+    // common.ptod("common.exit(): " + rc);
+    // System.out.println("common.exit(): " + rc);
 
     System.exit(rc);
   }
@@ -408,60 +384,51 @@ public class common
   /**
    * Sleep x milliseconds
    */
-  public static void sleep_some(long msecs)
-  {
+  public static void sleep_some(long msecs) {
     if (msecs == 0)
       return;
     sleep_some_usecs(msecs * 1000);
   }
 
-
   /**
    * Sleep x microseconds
    */
-  public static void sleep_some_usecs(long usecs)
-  {
-    //if (Vdbmain.isWorkloadDone() || SlaveJvm.isWorkloadDone())
-    //{
-    //  common.ptod("usecs: " + usecs);
-    //  common.where(8);
-    //}
+  public static void sleep_some_usecs(long usecs) {
+    // if (Vdbmain.isWorkloadDone() || SlaveJvm.isWorkloadDone())
+    // {
+    // common.ptod("usecs: " + usecs);
+    // common.where(8);
+    // }
 
-    try
-    {
+    try {
       Thread.sleep(usecs / 1000, (int) (usecs % 1000) * 1000);
     }
 
-    catch (InterruptedException x)
-    {
+    catch (InterruptedException x) {
       /* Basically ignore this interrupt now, but allow someone else to check */
-      /* for interrupted()                                                    */
+      /* for interrupted() */
       common.interruptThread();
     }
   }
 
-
   /**
-   * Print a timestamp followed by the included string.
-   * If string is null, do not print a carriage return.
+   * Print a timestamp followed by the included string. If string is null, do not
+   * print a carriage return.
    */
-  public static void ptod(String txt, PrintWriter pw)
-  {
-    //if (txt.contains("Searching for file names"))
-    //  common.where(8);
-    //if (txt.length() == 0)
-    //  common.where(8);
+  public static void ptod(String txt, PrintWriter pw) {
+    // if (txt.contains("Searching for file names"))
+    // common.where(8);
+    // if (txt.length() == 0)
+    // common.where(8);
 
     String tod = tod();
 
-    synchronized(ptod_lock)
-    {
+    synchronized (ptod_lock) {
       ptodFileIfNeeded(txt);
 
       /* During 'CTRL-C, don't bother writing any more messages to the console. */
       /* That just gets too confusing: */
-      if (!(pw == stdout && Ctrl_c.active()))
-      {
+      if (!(pw == stdout && Ctrl_c.active())) {
         if (txt != null)
           pw.println(tod + " " + txt);
         else
@@ -474,10 +441,8 @@ public class common
       if (SlaveJvm.isThisSlave() && pw == stdout)
         return;
 
-
       /* This acts the same as ptod(txt); stdout + logfile: */
-      if (pw == stdout && common.log_html != null)
-      {
+      if (pw == stdout && common.log_html != null) {
         if (txt != null)
           common.log_html.println(tod + " " + txt);
         else
@@ -487,16 +452,13 @@ public class common
   }
 
   private static Fput fp = null;
-  private static void ptodFileIfNeeded(String txt)
-  {
+
+  private static void ptodFileIfNeeded(String txt) {
     if (!get_debug(PTOD_TO_DISK))
       return;
-    if (fp == null)
-    {
-      for (int i = 0; i < 999; i++)
-      {
-        if (!new File("ptoddebug" + i).exists())
-        {
+    if (fp == null) {
+      for (int i = 0; i < 999; i++) {
+        if (!new File("ptoddebug" + i).exists()) {
           fp = new Fput("ptoddebug" + i);
           System.out.println("Created debug file: " + fp.getName());
           break;
@@ -508,31 +470,24 @@ public class common
     fp.flush();
   }
 
-  public static synchronized void ptod(Exception e)
-  {
+  public static synchronized void ptod(Exception e) {
     ptod(e.getClass().getName());
-    if (common.log_html != null)
-    {
+    if (common.log_html != null) {
       e.printStackTrace(common.log_html);
     }
     e.printStackTrace(System.out);
   }
 
-  public static void ptod(String format, Object ... args)
-  {
+  public static void ptod(String format, Object... args) {
     ptod(String.format(format, args));
   }
 
-  public static void pboth(String format, Object ... args)
-  {
+  public static void pboth(String format, Object... args) {
     /* If there are no arguments, don't use 'format': there may be some %% there: */
-    if (args.length == 0)
-    {
+    if (args.length == 0) {
       psum(format);
       ptod(format);
-    }
-    else
-    {
+    } else {
       psum(String.format(format, args));
       ptod(String.format(format, args));
     }
@@ -541,128 +496,108 @@ public class common
   /**
    * Print timestamped line to stdout and logfile
    */
-  public static void ptod(String txt)
-  {
-    //if (txt.contains("lines"))
-    //  common.where(8);
-    synchronized(ptod_lock)
-    {
+  public static void ptod(String txt) {
+    // if (txt.contains("lines"))
+    // common.where(8);
+    synchronized (ptod_lock) {
       /* For debugging: See also interruptThread() below: */
-      if (txt.startsWith("+") && SlaveJvm.isThisSlave())
-      {
-        if (!Thread.currentThread().isInterrupted())
-        {
+      if (txt.startsWith("+") && SlaveJvm.isThisSlave()) {
+        if (!Thread.currentThread().isInterrupted()) {
           SlaveJvm.sendMessageToConsole(txt);
           return;
-        }
-        else
+        } else
           txt = "sendMessageToConsole() bypassed due to interrupt: " + txt;
       }
 
-      if (stdout == null)
-      {
-        if (common_pw == null )
+      if (stdout == null) {
+        if (common_pw == null)
           common_pw = new PrintWriter(System.out, true);
         common.ptod(txt, common_pw);
-      }
-      else
+      } else
         common.ptod(txt, stdout);
     }
   }
 
+  public static void ptod(ArrayList<String> lines) {
+    synchronized (ptod_lock) {
+      for (String line : lines)
+        ptod(line);
+    }
+  }
 
-  public static void ptod(ArrayList <String> lines)
-  {
-    synchronized (ptod_lock)
-    {
+  public static void ptod(Vector<String> lines) {
+    synchronized (ptod_lock) {
       for (String line : lines)
         ptod(line);
     }
   }
-  public static void ptod(Vector <String> lines)
-  {
-    synchronized (ptod_lock)
-    {
-      for (String line : lines)
-        ptod(line);
-    }
-  }
-  public static void ptod(Object obj)
-  {
+
+  public static void ptod(Object obj) {
     ptod("" + obj);
   }
-  public static void plog(Object obj)
-  {
+
+  public static void plog(Object obj) {
     plog("" + obj);
   }
-
 
   /**
    * Print timestamped line to the summary file
    */
-  public static void psum(String format, Object ... args)
-  {
+  public static void psum(String format, Object... args) {
     psum(String.format(format, args));
   }
-  public static void psum(String txt)
-  {
+
+  public static void psum(String txt) {
     /* If the summary file is not open yet, do not print the message: */
     if (common.summ_html != null)
       common.ptod(txt, common.summ_html);
   }
 
-
   /**
    * Print timestamped line to logfile
    */
-  public static void plog(String format, Object ... args)
-  {
+  public static void plog(String format, Object... args) {
     plog(String.format(format, args));
   }
-  public static void plog(String txt)
-  {
+
+  public static void plog(String txt) {
     /* If the logfile is not open yet, do not print the message: */
     if (common.log_html != null)
       common.ptod(txt, common.log_html);
-    else if (!ignore_plog)
-    {
+    else if (!ignore_plog) {
       common.ptod("(plog) " + txt);
-      //common.where(8);
+      // common.where(8);
     }
   }
+
   private static boolean ignore_plog = false;
-  public static void ignoreIfNoPlog()
-  {
+
+  public static void ignoreIfNoPlog() {
     ignore_plog = true;
   }
 
-
   /**
-   * Create a printable timestamp.
-   * The reason why this is locked is a very unique hang in Java during the
-   * termination of the master. Java (1.6?) was locked in
-   * java.util.ResourceBundle.findBundle() trying create this
-   * SimpleDateFormat.
-   * No clue what caused the hang, but making this a locked static
-   * SimpleDateFormat may prevent this from happening again.
-   * (SimpleDateFormat is not thread-safe, so that's why the lock)
+   * Create a printable timestamp. The reason why this is locked is a very unique
+   * hang in Java during the termination of the master. Java (1.6?) was locked in
+   * java.util.ResourceBundle.findBundle() trying create this SimpleDateFormat. No
+   * clue what caused the hang, but making this a locked static SimpleDateFormat
+   * may prevent this from happening again. (SimpleDateFormat is not thread-safe,
+   * so that's why the lock)
    */
   private static DateFormat locked_df = new SimpleDateFormat("HH:mm:ss.SSS");
   private static boolean more_detail = false;
-  public static String tod()
-  {
 
-    synchronized(locked_df)
-    {
-      String ret = locked_df.format( new Date() );
-      if (more_detail)
-      {
+  public static String tod() {
+
+    synchronized (locked_df) {
+      String ret = locked_df.format(new Date());
+      if (more_detail) {
         long simple = Native.get_simple_tod();
-        long day    = simple % (24*3600000000l);  // 86.400.000.000
-        long hour   = day    /     3600000000l;
-        long min    = day    /       60000000l % 60;
-        long sec    = day    /        1000000l % 60;
-        long usec   = day    %        1000000l;
+        long day = simple % (24 * 3600000000l); // 86.400.000.000
+        long hour = day / 3600000000l;
+        long min = day / 60000000l % 60;
+        long sec = day / 1000000l % 60;
+        long usec = day % 1000000l;
         ret += " " + String.format("%02d:%02d:%02d.%06d", hour, min, sec, usec);
       }
       return ret;
@@ -673,32 +608,27 @@ public class common
   /**
    * Print methods to write output to console AND log
    */
-  public static void println(String text, PrintWriter pw)
-  {
+  public static void println(String text, PrintWriter pw) {
 
     pw.println(text);
     if (pw == stdout)
       common.log_html.println(text);
   }
 
-  public static void print(String text, PrintWriter pw)
-  {
+  public static void print(String text, PrintWriter pw) {
     pw.print(text);
     if (pw == stdout)
       common.log_html.print(text);
   }
 
-
   /**
    * Simple wildcard search. Only trailing '*' is a wildcard.
    */
-  public static boolean simple_wildcard(String key, String name)
-  {
-    if (key.charAt(key.length() -1) == '*')
-    {
+  public static boolean simple_wildcard(String key, String name) {
+    if (key.charAt(key.length() - 1) == '*') {
       String w1 = key.substring(0, key.length() - 1);
 
-      if (name.length() < key.length() -1)
+      if (name.length() < key.length() - 1)
         return false;
 
       String w2 = name.substring(0, key.length() - 1);
@@ -715,25 +645,21 @@ public class common
       return false;
   }
 
-
   /**
    * Remove a comma from a string
    */
-  public static String remove_comma(String name)
-  {
+  public static String remove_comma(String name) {
     if (name.indexOf(",") == -1)
       return name;
 
     return name.substring(0, name.indexOf(",")) + name.substring(name.indexOf(",") + 1);
   }
 
-
   /**
-   * Signal caller after n milliseconds.
-   * Returns zero if more than 'msecs' time elapsed since the first call.
+   * Signal caller after n milliseconds. Returns zero if more than 'msecs' time
+   * elapsed since the first call.
    */
-  public static long signal_caller(long base, long msecs)
-  {
+  public static long signal_caller(long base, long msecs) {
     long tod = Native.get_simple_tod();
 
     /* First call, just set base tod: */
@@ -747,16 +673,13 @@ public class common
     return base;
   }
 
-
   /**
    * Identify specific task completion failures and display appropriate message
    */
-  public static void abnormal_term(Throwable t)
-  {
+  public static void abnormal_term(Throwable t) {
     String bad_class = t.getClass().getName();
 
-    synchronized(out_of_memory_lock)
-    {
+    synchronized (out_of_memory_lock) {
       if (out_of_memory)
         return;
 
@@ -766,8 +689,7 @@ public class common
       if (bad_class.compareTo("java.lang.OutOfMemoryError") == 0)
         displayOutOfMemory();
 
-      if (bad_class.compareTo("java.lang.UnsatisfiedLinkError") == 0)
-      {
+      if (bad_class.compareTo("java.lang.UnsatisfiedLinkError") == 0) {
         /* Report memory usage: */
         common.ptod("Missing or incorrect shared library file. \n\n");
       }
@@ -779,41 +701,34 @@ public class common
     }
   }
 
-  private static void displayOutOfMemory()
-  {
+  private static void displayOutOfMemory() {
     /* Report memory usage: */
-    common.ptod("Out of memory: \n\n\t\t modify the vdbench script and increase the '-Xmx512m' value " +
-                "where 512m equals the java heap size requested. ");
-    common.ptod("If the error message says 'unable to create new native thread' " +
-                "modify the vdbench script adding '-Xss256k' or lower value for " +
-                "the java thread stack size. \n\n");
+    common.ptod("Out of memory: \n\n\t\t modify the vdbench script and increase the '-Xmx512m' value "
+        + "where 512m equals the java heap size requested. ");
+    common.ptod("If the error message says 'unable to create new native thread' "
+        + "modify the vdbench script adding '-Xss256k' or lower value for " + "the java thread stack size. \n\n");
     common.ptod("Examples are for Solaris. For other platforms see the Java provider's documentation");
 
     common.memory_usage();
     out_of_memory = true;
 
-    if (get_debug(RUN_JMAP))
-    {
+    if (get_debug(RUN_JMAP)) {
       spare_memory = null;
       runJmap();
     }
   }
 
-  public static int getProcessId()
-  {
+  public static int getProcessId() {
     return Integer.parseInt(ManagementFactory.getRuntimeMXBean().getName().split("@")[0]);
   }
-  public static String getProcessIdString()
-  {
+
+  public static String getProcessIdString() {
     return "" + getProcessId();
   }
 
-  public static void runJmap()
-  {
-    String[] args = new String[]
-    {
-      "xx", getProcessIdString()
-      //"xx", pid, "-m0"
+  public static void runJmap() {
+    String[] args = new String[] { "xx", getProcessIdString()
+        // "xx", pid, "-m0"
     };
     Jmap.main(args);
 
@@ -822,37 +737,29 @@ public class common
   /**
    * Report Java specific memory usage
    */
-  public static void memory_usage()
-  {
-    double free    = (double) Runtime.getRuntime().freeMemory()  / 1048576.0;
+  public static void memory_usage() {
+    double free = (double) Runtime.getRuntime().freeMemory() / 1048576.0;
     double current = (double) Runtime.getRuntime().totalMemory() / 1048576.0;
-    double max     = (double) Runtime.getRuntime().maxMemory()   / 1048576.0;
-    double used    = current - free;
+    double max = (double) Runtime.getRuntime().maxMemory() / 1048576.0;
+    double used = current - free;
 
     if (common.get_debug(common.PRINT_MEMORY))
-      common.ptod("Java Heap in MB. max: %8.3f; current: %8.3f; used: %8.3f; free: %8.3f",
-                  max, current, used, free);
+      common.ptod("Java Heap in MB. max: %8.3f; current: %8.3f; used: %8.3f; free: %8.3f", max, current, used, free);
     else
-      common.plog("Java Heap in MB. max: %8.3f; current: %8.3f; used: %8.3f; free: %8.3f",
-                  max, current, used, free);
+      common.plog("Java Heap in MB. max: %8.3f; current: %8.3f; used: %8.3f; free: %8.3f", max, current, used, free);
   }
-
 
   /**
    * Debugging flags: set
    */
-  public static void set_debug(int number)
-  {
+  public static void set_debug(int number) {
     Utils.common.set_debug(number);
   }
-
-
 
   /**
    * Debugging flags: query
    */
-  public static boolean get_debug(int number)
-  {
+  public static boolean get_debug(int number) {
     /* Someone asks for zero, he'll get it no matter what: */
     if (number == 0)
       return true;
@@ -860,78 +767,68 @@ public class common
     return Utils.common.get_debug(number);
   }
 
-
   /**
    * Debugging flags: get string with flags to pass to others
    */
-  public static String get_debug_string()
-  {
+  public static String get_debug_string() {
     return Utils.common.get_debug_string();
   }
-
 
   /**
    * Check where we're running
    */
-  static boolean onAix()
-  {
+  static boolean onAix() {
     return aix;
   }
-  static boolean onHp()
-  {
+
+  static boolean onHp() {
     return hp;
   }
-  public static boolean onLinux()
-  {
+
+  public static boolean onLinux() {
     return linux;
   }
-  public static boolean onZLinux()
-  {
+
+  public static boolean onZLinux() {
     return zlinux;
   }
-  public static boolean onWindows()
-  {
+
+  public static boolean onWindows() {
     return windows;
   }
-  public static boolean onSolaris()
-  {
+
+  public static boolean onSolaris() {
     return solaris;
   }
-  static boolean onMac()
-  {
+
+  static boolean onMac() {
     return mac;
   }
-  static boolean running64Bit()
-  {
+
+  static boolean running64Bit() {
     common.get_shared_lib();
     return arch_64_bit;
   }
 
-
-
   /**
    * Tell Java where he can find the JNI modules
    */
-  public static String get_shared_lib()
-  {
+  public static String get_shared_lib() {
     if (shared_library_dir != null)
       return shared_library_dir;
 
     String shared_library = null;
-    String sep       = System.getProperty("file.separator");
-    String bits      = System.getProperty("sun.arch.data.model");
-    String arch      = System.getProperty("os.arch");
+    String sep = System.getProperty("file.separator");
+    String bits = System.getProperty("sun.arch.data.model");
+    String arch = System.getProperty("os.arch");
     String classpath = ClassPath.classPath();
-    String dir       = null;
+    String dir = null;
 
-    if (onWindows())
-    {
-      if (bits.equals("64"))
-      {
+    if (onWindows()) {
+      if (bits.equals("64")) {
         if (Fget.file_exists(classpath + "windows", "vdbench64.dll"))
           dir = "windows" + sep + "vdbench64.dll";
-        else
-        {
+        else {
           String txt = "\n\n";
           txt += "Vdbench does not support 64-bit java on Windows.";
           txt += "\n\tPlease install 32-bit java and change file vdbench.bat ";
@@ -939,15 +836,12 @@ public class common
           txt += "\n\n";
           common.failure(txt);
         }
-      }
-      else
+      } else
         dir = "windows" + sep + "vdbench32.dll";
     }
 
-    else if (onSolaris())
-    {
-      if (arch.equals("amd64"))
-      {
+    else if (onSolaris()) {
+      if (arch.equals("amd64")) {
         dir = "solx86" + sep + "solx86-64.so";
         arch_64_bit = true;
       }
@@ -958,66 +852,55 @@ public class common
       else if (arch.equals("sparc"))
         dir = "solaris" + sep + "sparc32.so";
 
-      else if (arch.equals("sparcv9"))
-      {
+      else if (arch.equals("sparcv9")) {
         dir = "solaris" + sep + "sparc64.so";
         arch_64_bit = true;
       }
 
-      else common.failure("Unknown system architecture for solaris: " + " " + arch);
+      else
+        common.failure("Unknown system architecture for solaris: " + " " + arch);
     }
 
-    else if (onAix())
-    {
-      if (bits != null && bits.equals("64"))
-      {
+    else if (onAix()) {
+      if (bits != null && bits.equals("64")) {
         dir = "aix" + sep + "aix-64.so";
         arch_64_bit = true;
-      }
-      else if (arch.indexOf("64") != -1)
-      {
+      } else if (arch.indexOf("64") != -1) {
         dir = "aix" + sep + "aix-64.so";
         arch_64_bit = true;
-      }
-      else
+      } else
         dir = "aix" + sep + "aix-32.so";
     }
 
     else if (onMac())
       dir = "mac" + sep + "libvdbench.dylib";
 
-    //18:04:17.319 os.name                       HP-UX
-    //18:04:17.319 os.arch                       IA64N
+    // 18:04:17.319 os.name HP-UX
+    // 18:04:17.319 os.arch IA64N
     else if (onHp())
       dir = "hp" + sep + "libvdbench.sl";
 
-    else if (onZLinux())
-    {
+    else if (onZLinux()) {
       if (arch.equals("s390"))
         dir = "linux" + sep + "zlinux32.so";
-      else
-      {
+      else {
         dir = "linux" + sep + "zlinux64.so";
         arch_64_bit = true;
       }
     }
 
-    else if (onLinux())
-    {
-      if (arch.equals("sparcv9"))
-      {
+    else if (onLinux()) {
+      if (arch.equals("sparcv9")) {
         dir = "linux" + sep + "sparc64.so";
         arch_64_bit = true;
       }
 
-      else if (arch.equals("arm"))
-      {
+      else if (arch.equals("arm")) {
         dir = "linux" + sep + "arm32.so";
         arch_64_bit = false;
       }
 
-      else if (arch.equals("aarch64"))
-      {
+      else if (arch.equals("aarch64")) {
         dir = "linux" + sep + "aarch64.so";
         arch_64_bit = true;
       }
@@ -1025,23 +908,21 @@ public class common
       else if (arch.equals("sparc"))
         dir = "linux" + sep + "sparc32.so";
 
-      else if (arch.startsWith("ppc64"))       // From Jvon Barnes  ppc64le from Jim M.
+      else if (arch.startsWith("ppc64")) // From Jvon Barnes ppc64le from Jim M.
       {
         dir = "linux" + sep + "ppc64.so";
         arch_64_bit = true;
       }
 
-      else if (arch.equals("ppc32"))       // This is not confirmed!
+      else if (arch.equals("ppc32")) // This is not confirmed!
         dir = "linux" + sep + "ppc32.so";
 
-      else if (arch.indexOf("64") != -1)
-      {
+      else if (arch.indexOf("64") != -1) {
         dir = "linux" + sep + "linux64.so";
         arch_64_bit = true;
       }
 
-      else if (bits != null && bits.equalsIgnoreCase("64"))
-      {
+      else if (bits != null && bits.equalsIgnoreCase("64")) {
         dir = "linux" + sep + "linux64.so";
         arch_64_bit = true;
       }
@@ -1050,43 +931,32 @@ public class common
         dir = "linux" + sep + "linux32.so";
     }
 
-
     else
-      common.failure("Undefined support requested for platform: " +
-                     System.getProperty("os.arch") +
-                     "; contact me at the Oracle Vdbench Forum for support");
+      common.failure("Undefined support requested for platform: " + System.getProperty("os.arch")
+          + "; contact me at the Oracle Vdbench Forum for support");
 
     File full = new File(classpath + dir);
-    try
-    {
-      shared_library     = full.getCanonicalPath();
+    try {
+      shared_library = full.getCanonicalPath();
       shared_library_dir = full.getParent() + File.separator;
-      //common.ptod("Setting shared library to: " + shared_library);
+      // common.ptod("Setting shared library to: " + shared_library);
 
-      /* This is here to deal with VirtualBox not supporting memory mapping:  */
+      /* This is here to deal with VirtualBox not supporting memory mapping: */
       /* (Apparently only for shared library loading though. DV mmap is fine) */
-      if (get_debug(USE_TMP_SHARED_LIBRARY))
-      {
+      if (get_debug(USE_TMP_SHARED_LIBRARY)) {
         String temp = Utils.CopyFile.copyToTemp(shared_library);
-        //common.plog("1Setting shared library to: " + temp);
+        // common.plog("1Setting shared library to: " + temp);
         System.load(temp);
-      }
-      else
-      {
-        //common.plog("2Setting shared library to: " + shared_library);
+      } else {
+        // common.plog("2Setting shared library to: " + shared_library);
         System.load(shared_library);
       }
 
-
-
     }
 
-    catch (Throwable t)
-    {
-      synchronized (ptod_lock)
-      {
-        if (!full.exists())
-        {
+    catch (Throwable t) {
+      synchronized (ptod_lock) {
+        if (!full.exists()) {
           common.ptod("");
           common.ptod("File " + shared_library + " does not exist.");
           common.ptod("This may be an OS that a shared library currently ");
@@ -1107,39 +977,30 @@ public class common
     return shared_library_dir;
   }
 
-
   /**
-   * Replace a string within a string.
-   * This is a 'replace once'.
+   * Replace a string within a string. This is a 'replace once'.
    */
-  public static String replace_string(String string, String find, String replace)
-  {
+  public static String replace_string(String string, String find, String replace) {
 
-    if (string.indexOf(find) != -1)
-    {
+    if (string.indexOf(find) != -1) {
       String one = string.substring(0, string.indexOf(find));
       String two = string.substring(string.indexOf(find) + find.length());
       return one + replace + two;
-    }
-    else
+    } else
       return string;
   }
 
-
   /**
-   * Run vdb init scripts.
-   * Execute config.sh from the install directory eg. vdbench/solaris/
-   * and also my_config.sh to prevent a reinstall from overlaying user's
-   * modified contents of config.sh.
-   * (The latter is not true necause it is likely that my_config.sh gets
-   * overlaid also).
+   * Run vdb init scripts. Execute config.sh from the install directory eg.
+   * vdbench/solaris/ and also my_config.sh to prevent a reinstall from overlaying
+   * user's modified contents of config.sh. (The latter is not true necause it is
+   * likely that my_config.sh gets overlaid also).
    *
    * 50407rc22: first look in the PARENT of the current Vdbench install for
-   * directory /vdbscripts/. If there, look for the scripts.
-   * otherwise, back to shared libray.
+   * directory /vdbscripts/. If there, look for the scripts. otherwise, back to
+   * shared libray.
    */
-  public static void run_config_scripts()
-  {
+  public static void run_config_scripts() {
     /* Ignore when we find 'noconfig' or '-d18': */
     if (Fget.file_exists(ClassPath.classPath("noconfig")))
       return;
@@ -1159,15 +1020,16 @@ public class common
     if (command1 == null && command2 == null)
       return;
 
-
     pw_config = Report.createHmtlFile("config.html");
 
-    /* No WHY is this one here? it gets expensive with a lot of files and slow network: */
-    //Report.chModAllReports();
+    /*
+     * No WHY is this one here? it gets expensive with a lot of files and slow
+     * network:
+     */
+    // Report.chModAllReports();
     Report.getSummaryReport().printHtmlLink("Link to config output", "config", "config");
 
-    if (command1 != null)
-    {
+    if (command1 != null) {
       /* Before we can run os_command() Native must load the shared libraries: */
       Native x = new Native();
 
@@ -1189,9 +1051,7 @@ public class common
       pw_config.println();
     }
 
-
-    if (command2 != null)
-    {
+    if (command2 != null) {
       /* Run my_config.sh: */
       OS_cmd ocmd = new OS_cmd();
       ocmd.addText(command2);
@@ -1213,23 +1073,20 @@ public class common
     if (pw_config != null)
       pw_config.close();
 
-
     long elapsed = System.currentTimeMillis() - start;
     if (elapsed > 5000)
       common.ptod("Running 'config.sh' took more than 5 seconds: " + elapsed + "ms.");
   }
 
-
   /**
    * Look for the config script first in directory /vdbscripts/ in the parent of
-   * the current vdbench install directory.
-   * After that, look for it in our own shared library.
+   * the current vdbench install directory. After that, look for it in our own
+   * shared library.
    */
-  public static String findscript(String script)
-  {
-    String cp     = ClassPath.classPath();
+  public static String findscript(String script) {
+    String cp = ClassPath.classPath();
     String parent = new File(cp).getParentFile().getAbsolutePath();
-    String dir    = parent + File.separator + "vdbscripts";
+    String dir = parent + File.separator + "vdbscripts";
     if (Fget.file_exists(dir, script))
       return new File(dir, script).getAbsolutePath();
 
@@ -1241,64 +1098,50 @@ public class common
   }
 
   /**
-   * Replace String within String.
-   * This is a 'replace all'.
+   * Replace String within String. This is a 'replace all'.
    */
-  public static String replace(String source, String old_value, String new_value)
-  {
-    //common.ptod("source: " + source);
-    //common.ptod("value: " + value);
-    //common.ptod("nval: " + nval);
+  public static String replace(String source, String old_value, String new_value) {
+    // common.ptod("source: " + source);
+    // common.ptod("value: " + value);
+    // common.ptod("nval: " + nval);
 
-    while (source.indexOf(old_value) != -1)
-    {
+    while (source.indexOf(old_value) != -1) {
       int index = source.indexOf(old_value);
-      source = source.substring(0, index) + new_value + source.substring(index+old_value.length());
+      source = source.substring(0, index) + new_value + source.substring(index + old_value.length());
     }
 
-    //common.ptod("source: " + source);
+    // common.ptod("source: " + source);
     return source;
   }
-
 
   /**
    * Debugging, write/read object
    */
-  public static void serial_out(String fname, Object obj)
-  {
+  public static void serial_out(String fname, Object obj) {
     ObjectOutputStream os;
-    try
-    {
+    try {
       os = new ObjectOutputStream(new FileOutputStream(fname));
       os.writeObject(obj);
       os.close();
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       common.failure(e);
     }
   }
 
-  public static Object serial_in(String fname)
-  {
+  public static Object serial_in(String fname) {
     if (!Fget.file_exists(fname))
       common.failure("unknown serial_in file: " + fname);
-    Object obj  = null;
+    Object obj = null;
 
-    try
-    {
+    try {
       ObjectInputStream is = new ObjectInputStream(new FileInputStream(fname));
       obj = is.readObject();
       is.close();
-    }
-    catch (StreamCorruptedException e)
-    {
-      //e.printStackTrace(log);
-      //e.printStackTrace();
+    } catch (StreamCorruptedException e) {
+      // e.printStackTrace(log);
+      // e.printStackTrace();
       return null;
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       e.printStackTrace(log_html);
       e.printStackTrace();
       return null;
@@ -1307,22 +1150,16 @@ public class common
     return obj;
   }
 
-
-
-  private static void doWhere(int lines_wanted, String txt)
-  {
-    synchronized (ptod_lock)
-    {
+  private static void doWhere(int lines_wanted, String txt) {
+    synchronized (ptod_lock) {
       String line;
       int lines_done = 0;
       StackTraceElement[] stack = new Throwable().getStackTrace();
 
-      if (!get_debug(PRINT_WIDE_WHERE))
-      {
+      if (!get_debug(PRINT_WIDE_WHERE)) {
         if (txt != null)
           common.ptod("==> where: " + txt);
-        for (int i = 2; i < stack.length && lines_done++ < lines_wanted; i++)
-        {
+        for (int i = 2; i < stack.length && lines_done++ < lines_wanted; i++) {
           if (txt == null && lines_done == 1)
             line = "==> where: ";
           else
@@ -1332,13 +1169,11 @@ public class common
         }
       }
 
-      else
-      {
+      else {
         StringBuffer buf = new StringBuffer(1024);
         if (txt != null)
-          buf.append("==> where: " + txt );
-        for (int i = 2; i < stack.length && lines_done++ < lines_wanted; i++)
-        {
+          buf.append("==> where: " + txt);
+        for (int i = 2; i < stack.length && lines_done++ < lines_wanted; i++) {
           if (txt == null && lines_done == 1)
             buf.append(" ==> where: ");
           else
@@ -1350,29 +1185,23 @@ public class common
     }
   }
 
-  public static void where(int lines_wanted, String txt)
-  {
+  public static void where(int lines_wanted, String txt) {
     doWhere(lines_wanted, txt);
   }
 
-  public static void where()
-  {
+  public static void where() {
     doWhere(1, null);
   }
 
-  public static void where(int lines)
-  {
+  public static void where(int lines) {
     doWhere(lines, null);
   }
 
-  public static void where(String txt)
-  {
+  public static void where(String txt) {
     doWhere(1, txt);
   }
 
-
-  public static void printStacktrace()
-  {
+  public static void printStacktrace() {
     StackTraceElement[] stack = new Throwable().getStackTrace();
     String txt = "\n\t\tStack Trace: ";
     for (int i = 0; stack != null && i < stack.length; i++)
@@ -1380,8 +1209,8 @@ public class common
 
     common.ptod(txt);
   }
-  public static String getStacktrace()
-  {
+
+  public static String getStacktrace() {
     StackTraceElement[] stack = new Throwable().getStackTrace();
     String txt = "\n\t\tStack Trace: ";
     for (int i = 0; stack != null && i < stack.length; i++)
@@ -1390,35 +1219,35 @@ public class common
     return txt;
   }
 
-  public static void main(String args[])
-  {
+  public static void main(String args[]) {
     String fname = findscript("config.sh");
     common.ptod("fname: " + fname);
   }
 
-  public static void main1(String args[])
-  {
+  public static void main1(String args[]) {
 
     // test sign bit after picking up a long
-    //   int  key   = 0xff;
-    //   long block = 0xfffffffffL;
+    // int key = 0xff;
+    // long block = 0xfffffffffL;
     //
-    //   long stored = ((long) key) << 56 | block;
-    //   common.ptod("key: %02x %08x", key, block);
-    //   common.ptod("key: %02x %08x %08x %016x", key, (int) (block >> 32), (int) block, stored);
+    // long stored = ((long) key) << 56 | block;
+    // common.ptod("key: %02x %08x", key, block);
+    // common.ptod("key: %02x %08x %08x %016x", key, (int) (block >> 32), (int)
+    // block, stored);
     //
-    //   key   = (int) (stored >>> 56);
-    //   block = stored & 0xffffffffffffL;
+    // key = (int) (stored >>> 56);
+    // block = stored & 0xffffffffffffL;
     //
-    //   common.ptod("key: %02x %08x %08x %016x", key, (int) (block >> 32), (int) block, stored);
+    // common.ptod("key: %02x %08x %08x %016x", key, (int) (block >> 32), (int)
+    // block, stored);
     //
-    //   key   = (int) (stored >>> 56);
-    //   block = stored << 8 >>> 8;
+    // key = (int) (stored >>> 56);
+    // block = stored << 8 >>> 8;
     //
-    //   common.ptod("key: %02x %08x %08x %016x", key, (int) (block >> 32), (int) block, stored);
+    // common.ptod("key: %02x %08x %08x %016x", key, (int) (block >> 32), (int)
+    // block, stored);
 
-
-    int key    = 0xff;
+    int key = 0xff;
     int block0 = 0x7;
     int block1 = 0x89abcdef;
 
@@ -1430,69 +1259,60 @@ public class common
     long_value = make64Key(key, block0, block1);
     common.ptod("key: " + getKey(long_value));
 
-    common.ptod("left32:  %08x ", left32(long_value) );
+    common.ptod("left32:  %08x ", left32(long_value));
     common.ptod("right32: %08x ", right32(long_value));
 
   }
 
+  private static int left32(long long_value) {
+    return (int) (long_value >>> 32);
+  }
 
-  private static int left32(long long_value)
-  {
-    return(int) (long_value >>> 32);
+  private static int right32(long long_value) {
+    return (int) long_value;
   }
-  private static int right32(long long_value)
-  {
-    return(int) long_value;
-  }
-  private static long make64Key(long key, int left, int right)
-  {
+
+  private static long make64Key(long key, int left, int right) {
     return make64(left, right) | (key << 56);
   }
-  private static long make64(int left, int right)
-  {
+
+  private static long make64(int left, int right) {
     long long_value = ((long) left) << 32;
-    long_value     |= ((long) right) &0xffffffffL;
+    long_value |= ((long) right) & 0xffffffffL;
     return long_value;
   }
-  public static int getKey(long long_value)
-  {
-    return(int) ((long_value >> 56) & 0xff);
+
+  public static int getKey(long long_value) {
+    return (int) ((long_value >> 56) & 0xff);
   }
-  public static long addKey(long key, long long_value)
-  {
-    return(key << 56) | long_value;
+
+  public static long addKey(long key, long long_value) {
+    return (key << 56) | long_value;
   }
 
   // from java 1.8 Integer.toUnsignedLong()
-  public static long toUnsignedLong(int x)
-  {
-    return((long) x) & 0xffffffffL;
+  public static long toUnsignedLong(int x) {
+    return ((long) x) & 0xffffffffL;
   }
 
-
-  public static void main3(String args[]) throws Exception
-  {
-    long MB             = 1024l * 1024l;
-    long GB             = 1024l * 1024l * 1024l;
-    long TB             = 1024l * 1024l * 1024l * 1024l;
-    long unit           = 4 * 1024l;
-    long blocks         = 100 * MB / unit;
+  public static void main3(String args[]) throws Exception {
+    long MB = 1024l * 1024l;
+    long GB = 1024l * 1024l * 1024l;
+    long TB = 1024l * 1024l * 1024l * 1024l;
+    long unit = 4 * 1024l;
+    long blocks = 100 * MB / unit;
     long uniques_needed = 10000; // blocks * 40 / 100;
-    long uniques_found  = 0;
-    long modulo         = blocks / uniques_needed;
-
+    long uniques_found = 0;
+    long modulo = blocks / uniques_needed;
 
     common.ptod("blocks:         " + blocks);
     common.ptod("uniques_needed: " + uniques_needed);
     common.ptod("modulo:         " + modulo);
 
-    for (long block = 0; block < blocks; block ++)
-    {
-      if (block % modulo == 0)
-      {
-        if (block < 20)
-        {
-          //common.ptod("result: block: %4.0f %40.16f ", block, result);
+    for (long block = 0; block < blocks; block++) {
+      if (block % modulo == 0) {
+        if (block < 20) {
+          // common.ptod("result: block: %4.0f %40.16f ", block, result);
           common.ptod("block: " + block);
         }
         uniques_found++;
@@ -1502,52 +1322,51 @@ public class common
     common.ptod("uniques_needed: " + uniques_needed);
     common.ptod("uniques_found:  " + uniques_found);
 
-
-
-    //   long MB             = 1024l * 1024l;
-    //   long GB             = 1024l * 1024l * 1024l;
-    //   long TB             = 1024l * 1024l * 1024l * 1024l;
-    //   long unit           = 128 * 1024l;
-    //   long blocks         = 100 * MB / unit;
-    //   long uniques_needed = 360; // blocks * 50 / 100;
-    //   long uniques_found  = 0;
+    // long MB = 1024l * 1024l;
+    // long GB = 1024l * 1024l * 1024l;
+    // long TB = 1024l * 1024l * 1024l * 1024l;
+    // long unit = 128 * 1024l;
+    // long blocks = 100 * MB / unit;
+    // long uniques_needed = 360; // blocks * 50 / 100;
+    // long uniques_found = 0;
     //
-    //   double every       = (double) blocks / uniques_needed;
-    //   long   delta_every = (long) ((every / 100) * 1000000);
-    //   common.ptod("every:       " + every);
-    //   common.ptod("delta_every: " + delta_every);
+    // double every = (double) blocks / uniques_needed;
+    // long delta_every = (long) ((every / 100) * 1000000);
+    // common.ptod("every: " + every);
+    // common.ptod("delta_every: " + delta_every);
     //
-    //   common.ptod("blocks:         " + blocks);
-    //   common.ptod("uniques_needed: " + uniques_needed);
-    //   common.ptod("blocks / uniques_needed: " + blocks / uniques_needed);
+    // common.ptod("blocks: " + blocks);
+    // common.ptod("uniques_needed: " + uniques_needed);
+    // common.ptod("blocks / uniques_needed: " + blocks / uniques_needed);
     //
-    //   for (long block = 0; block < blocks; block ++)
-    //   {
-    //     double t1    = (double) block / uniques_needed;
-    //     long   t2    = block / uniques_needed;
-    //     double delta = t1 - t2;
-    //     long   delta_long = (long) (delta * 1000000) ;
-    //     //delta_long = delta_long % 100000;
+    // for (long block = 0; block < blocks; block ++)
+    // {
+    // double t1 = (double) block / uniques_needed;
+    // long t2 = block / uniques_needed;
+    // double delta = t1 - t2;
+    // long delta_long = (long) (delta * 1000000) ;
+    // //delta_long = delta_long % 100000;
     //
-    //     //common.ptod("delta: %08d", (long) (delta * 1000000));
+    // //common.ptod("delta: %08d", (long) (delta * 1000000));
     //
-    //     boolean match = delta_long % delta_every == 0;
-    //     //if (block < 30)
-    //     //if (match)
-    //     {
-    //       common.ptod("t1: %12.8f %8df %12.8f %5b %08d %08d", t1, t2, delta,  match, delta_long, delta_every);
-    //       //common.ptod("block: " + block);
-    //     }
+    // boolean match = delta_long % delta_every == 0;
+    // //if (block < 30)
+    // //if (match)
+    // {
+    // common.ptod("t1: %12.8f %8df %12.8f %5b %08d %08d", t1, t2, delta, match,
+    // delta_long, delta_every);
+    // //common.ptod("block: " + block);
+    // }
     //
-    //     if (match)
-    //     //if (block % (blocks / uniques_needed) == 0)
-    //     {
-    //       uniques_found++;
-    //     }
-    //   }
-    //   common.ptod("blocks:         " + blocks);
-    //   common.ptod("uniques_needed: " + uniques_needed);
-    //   common.ptod("uniques_found:  " + uniques_found);
+    // if (match)
+    // //if (block % (blocks / uniques_needed) == 0)
+    // {
+    // uniques_found++;
+    // }
+    // }
+    // common.ptod("blocks: " + blocks);
+    // common.ptod("uniques_needed: " + uniques_needed);
+    // common.ptod("uniques_found: " + uniques_found);
   }
 
   /**
@@ -1555,8 +1374,7 @@ public class common
    *
    * Minimum 8 bytes for any even empty instance.
    **/
-  public static void sizeof(String args[]) throws Exception
-  {
+  public static void sizeof(String args[]) throws Exception {
     int loops = 1000000;
     if (args.length > 0)
       loops = Integer.parseInt(args[0]);
@@ -1565,20 +1383,15 @@ public class common
     /* Make sure we have no old garbage: */
     System.gc();
     System.gc();
-    double used_at_start = Runtime.getRuntime().totalMemory() -
-                           Runtime.getRuntime().freeMemory();
+    double used_at_start = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 
-
-    for (int i = 0; i < loops; i++)
-    {
+    for (int i = 0; i < loops; i++) {
       sink[i] = new FileEntry();
     }
 
-
     System.gc();
     System.gc();
-    double used_at_end = Runtime.getRuntime().totalMemory() -
-                         Runtime.getRuntime().freeMemory();
+    double used_at_end = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 
     common.ptod("used_at_start: " + used_at_start / 1048576.);
     common.ptod("used_at_end:   " + used_at_end / 1048576.);
@@ -1591,38 +1404,28 @@ public class common
       dummy += sink[i].hashCode();
   }
 
-
   /**
-  * Get the IP address for the current host.
-  *
-  * There has been a problem once with the system not being able to find its own
-  * local IP addres:
-  *
-  *   The /etc/nsswitch.conf file entry for hosts was:
-  * nis [NOTFOUND=return] files
-  *
-  * This host is not in NIS, so I reordered the entry to
-  * files nis [NOTFOUND=return]
-  * John.Wieczorek@Sun.COM
-  */
-  public static String getCurrentIP()
-  {
+   * Get the IP address for the current host.
+   *
+   * There has been a problem once with the system not being able to find its own
+   * local IP addres:
+   *
+   * The /etc/nsswitch.conf file entry for hosts was: nis [NOTFOUND=return] files
+   *
+   * This host is not in NIS, so I reordered the entry to files nis
+   * [NOTFOUND=return] John.Wieczorek@Sun.COM
+   */
+  public static String getCurrentIP() {
     String current_ip = null;
-    try
-    {
+    try {
       current_ip = InetAddress.getLocalHost().getHostAddress();
-    }
-    catch (UnknownHostException e)
-    {
-      try
-      {
+    } catch (UnknownHostException e) {
+      try {
         common.ptod("Can not determine current network IP address: " + InetAddress.getLocalHost());
         common.ptod("Returning instead the host name: " + InetAddress.getLocalHost().getHostName());
 
         return InetAddress.getLocalHost().getHostName();
-      }
-      catch (UnknownHostException e2)
-      {
+      } catch (UnknownHostException e2) {
         common.where();
         common.failure(e2);
       }
@@ -1631,19 +1434,18 @@ public class common
     return current_ip;
   }
 
-
   private static String fatal_marker = "*Fatal error*";
-  public static boolean isFatal(String line)
-  {
+
+  public static boolean isFatal(String line) {
     if (line == null)
       return false;
-    return(line.indexOf(fatal_marker) != -1);
+    return (line.indexOf(fatal_marker) != -1);
   }
 
-
-  public static void notifySlaves()
-  {
-    /* try to send message to the slaves so that they know this was a 'deliberate' */
+  public static void notifySlaves() {
+    /*
+     * try to send message to the slaves so that they know this was a 'deliberate'
+     */
     /* termination of the socket: */
     SlaveList.killSlaves();
 
@@ -1654,9 +1456,7 @@ public class common
     common.sleep_some(1000);
   }
 
-
-  public static String get_stacktrace()
-  {
+  public static String get_stacktrace() {
     StackTraceElement[] stack = new Throwable().getStackTrace();
     String txt = "\nStack Trace: ";
     for (int i = 0; stack != null && i < stack.length; i++)
@@ -1664,8 +1464,7 @@ public class common
     return txt;
   }
 
-  public static String get_stacktrace(Exception e)
-  {
+  public static String get_stacktrace(Exception e) {
     StackTraceElement[] stack = e.getStackTrace();
     String txt = "\nStack Trace: ";
     for (int i = 0; stack != null && i < stack.length; i++)
@@ -1673,15 +1472,13 @@ public class common
     return txt;
   }
 
-  public static void main2(String args[]) throws Exception
-  {
+  public static void main2(String args[]) throws Exception {
     OS_cmd ocmd = new OS_cmd();
     ocmd.addText("/usr/bin/ls -alF " + args[0]);
 
     ocmd.execute();
     String[] stdout = ocmd.getStdout();
-    if (stdout.length != 1)
-    {
+    if (stdout.length != 1) {
       for (int i = 0; i < stdout.length; i++)
         common.ptod("stdout: " + stdout[i]);
       common.ptod("Unexpected length from 'ls' command");
@@ -1691,8 +1488,7 @@ public class common
     String line = stdout[0];
 
     StringTokenizer st = new StringTokenizer(line);
-    if (st.countTokens() != 11)
-    {
+    if (st.countTokens() != 11) {
       common.ptod("line: " + line);
       common.ptod("Unexpected contents from 'ls' command");
       return;
@@ -1702,8 +1498,7 @@ public class common
 
     common.ptod("device_name: " + device_name);
 
-    if (!device_name.startsWith("../../devices"))
-    {
+    if (!device_name.startsWith("../../devices")) {
       common.ptod("device_name: " + device_name);
       common.ptod("Device name does not start with ../../devices");
       return;
@@ -1712,21 +1507,17 @@ public class common
     device_name = device_name.substring(13);
     common.ptod("device_name: " + device_name);
 
-    if (!device_name.endsWith(":"))
-    {
+    if (!device_name.endsWith(":")) {
       common.ptod("device_name: " + device_name);
       common.ptod("Device name does not end with ':'");
       return;
     }
 
-    device_name = device_name.substring(0, device_name.length() -1);
+    device_name = device_name.substring(0, device_name.length() - 1);
     common.ptod("device_name: " + device_name);
 
-
-
     Vector paths = Fget.read_file_to_vector("/etc/path_to_inst");
-    for (int i = 0; i < paths.size(); i++)
-    {
+    for (int i = 0; i < paths.size(); i++) {
       line = (String) paths.elementAt(i);
       if (line.startsWith("#"))
         continue;
@@ -1734,15 +1525,15 @@ public class common
       if (st.countTokens() != 3)
         continue;
 
-      //if (line.indexOf("9ec940") == -1)
-      //  continue;
+      // if (line.indexOf("9ec940") == -1)
+      // continue;
 
-      String path   = common.replace(st.nextToken(), "\"", "");
+      String path = common.replace(st.nextToken(), "\"", "");
       String number = st.nextToken();
       String driver = common.replace(st.nextToken(), "\"", "");
 
-      //common.ptod("path:        " + path);
-      //common.ptod("device_name: " + device_name);
+      // common.ptod("path: " + path);
+      // common.ptod("device_name: " + device_name);
 
       if (!device_name.equals(path))
         continue;
@@ -1754,10 +1545,8 @@ public class common
 
   }
 
-
   // This works only for Java 1.5
-  public static void dumpAllStacks()
-  {
+  public static void dumpAllStacks() {
     ThreadGroup tg = Thread.currentThread().getThreadGroup();
     ptod("tg: " + tg);
     ptod("tg.get_name: " + tg.getName());
@@ -1767,8 +1556,7 @@ public class common
     Thread tl[] = new Thread[Thread.currentThread().activeCount() + 5]; // Fudge factor
     int threads = Thread.currentThread().enumerate(tl);
 
-    for (int i = 0; i < threads; i++)
-    {
+    for (int i = 0; i < threads; i++) {
       ptod("tl            " + tl);
       ptod("tl[]:         " + tl[i]);
       ptod("tl[].isalive: " + tl[i].isAlive());
@@ -1776,17 +1564,17 @@ public class common
       dumpOneStack(tl[i]);
     }
   }
-  public static void dumpOneStack(Thread th)
-  {
-    //common.ptod("dumpOneStack functionality depends on using Java 1.5 and up. ivgnored. ");
+
+  public static void dumpOneStack(Thread th) {
+    // common.ptod("dumpOneStack functionality depends on using Java 1.5 and up.
+    // ivgnored. ");
     StackTraceElement[] els = th.getStackTrace();
 
     for (int i = 0; i < els.length; i++)
       ptod("dumpOneStack: " + els[i].getClassName() + " " + els[i].getLineNumber());
   }
 
-  public static long parseSize(String prm)
-  {
+  public static long parseSize(String prm) {
     if (prm.startsWith("0x"))
       return Long.parseLong(prm.substring(2), 16);
 
@@ -1804,29 +1592,23 @@ public class common
     if (multi != 1)
       parm = parm.substring(0, parm.length() - 1);
 
-    try
-    {
+    try {
       return Long.parseLong(parm) * multi;
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       common.ptod("Numeric value parsing; invalid value: %s", prm);
       common.failure(e);
     }
     return 0;
   }
 
-
   /**
    * Make large numbers look easier to deal with.
    */
-  public static String whatSize(double size)
-  {
+  public static String whatSize(double size) {
     return whatSizeX(size, 3);
   }
 
-  public static String whatSizeX(double size, int digits)
-  {
+  public static String whatSizeX(double size, int digits) {
     double KB = 1024.;
     double MB = 1024. * 1024.;
     double GB = 1024. * 1024. * 1024.;
@@ -1834,7 +1616,7 @@ public class common
     double PB = 1024. * 1024. * 1024. * 1024. * 1024.;
     String txt;
     String mask = String.format("%%.%df%%s", digits);
-    String tail_end = ".000000000000000".substring(0, 1+digits);
+    String tail_end = ".000000000000000".substring(0, 1 + digits);
 
     if (size < 100000)
       txt = "" + (int) size;
@@ -1855,57 +1637,44 @@ public class common
     return txt;
   }
 
-  public static boolean isNumeric(String txt)
-  {
-    try
-    {
+  public static boolean isNumeric(String txt) {
+    try {
       long number = Long.parseLong(txt);
-    }
-    catch (NumberFormatException e)
-    {
+    } catch (NumberFormatException e) {
       return false;
     }
     return true;
   }
-  public static boolean isDouble(String txt)
-  {
-    try
-    {
+
+  public static boolean isDouble(String txt) {
+    try {
       double number = Double.parseDouble(txt);
-    }
-    catch (NumberFormatException e)
-    {
+    } catch (NumberFormatException e) {
       return false;
     }
     return true;
   }
 
   /**
-   * Interrupt any thread.
-   * This lock is needed to avoid anything during a ptod() from being
-   * interrupted causing aborts.
+   * Interrupt any thread. This lock is needed to avoid anything during a ptod()
+   * from being interrupted causing aborts.
    *
    * For some still unbelievable reason, when doing a ptod() AFTER the
-   * t.interrupt(), the interrupt is LOST..... ?????
-   * There's nothing in Vdbench code that directly could cause this.
-   * 09/24/2010
+   * t.interrupt(), the interrupt is LOST..... ????? There's nothing in Vdbench
+   * code that directly could cause this. 09/24/2010
    */
-  public static void interruptThread()
-  {
+  public static void interruptThread() {
     interruptThread(Thread.currentThread());
   }
-  public static void interruptThread(Thread t)
-  {
-    synchronized (ptod_lock)
-    {
+
+  public static void interruptThread(Thread t) {
+    synchronized (ptod_lock) {
       t.interrupt();
 
-      //ptod("after: " + Thread.currentThread());
-      //ptod("interruptThread2 " + t + " " + t.isInterrupted());
-      //ptod("interruptThread3 " + t + " " + t.isInterrupted());
-      //ptod("interruptThread4 " + t + " " + t.isInterrupted());
+      // ptod("after: " + Thread.currentThread());
+      // ptod("interruptThread2 " + t + " " + t.isInterrupted());
+      // ptod("interruptThread3 " + t + " " + t.isInterrupted());
+      // ptod("interruptThread4 " + t + " " + t.isInterrupted());
     }
   }
 }
-
-

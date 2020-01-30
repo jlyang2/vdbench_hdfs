@@ -10,39 +10,31 @@ package Vdb;
 
 import java.io.*;
 
-class OpCopy extends FwgThread
-{
-  private final static String c =
-  "Copyright (c) 2000, 2016, Oracle and/or its affiliates. All rights reserved.";
+class OpCopy extends FwgThread {
+  private final static String c = "Copyright (c) 2000, 2016, Oracle and/or its affiliates. All rights reserved.";
 
-  public OpCopy(Task_num tn, FwgEntry fwg)
-  {
+  public OpCopy(Task_num tn, FwgEntry fwg) {
     super(tn, fwg);
   }
-
-
 
   /**
    * Copy files.
    *
-   * The output file that we look for MUST have the correct size
-   * because that determines the length of the DV_map.
+   * The output file that we look for MUST have the correct size because that
+   * determines the length of the DV_map.
    */
-  protected boolean doOperation() throws InterruptedException
-  {
+  protected boolean doOperation() throws InterruptedException {
     FileEntry input_fe;
     FileEntry output_fe;
 
-    while (true)
-    {
+    while (true) {
       /* Find a full file to copy: */
       input_fe = findFileToRead();
       if (input_fe == null)
         return false;
 
       /* For file_select=seq, if the input file has been copied, we're done: */
-      if (!fwg.select_random && input_fe.hasBeenCopied())
-      {
+      if (!fwg.select_random && input_fe.hasBeenCopied()) {
         input_fe.setUnBusy();
         return false;
       }
@@ -51,8 +43,7 @@ class OpCopy extends FwgThread
       output_fe = fwg.target_anchor.getRelativeFile(input_fe.getFileNoInList());
 
       /* If target file is busy, try an other one: */
-      if (!output_fe.setFileBusyExc())
-      {
+      if (!output_fe.setFileBusyExc()) {
         block(Blocked.FILE_BUSY);
         input_fe.setUnBusy();
         continue;
@@ -67,12 +58,11 @@ class OpCopy extends FwgThread
 
     /* Now start copying: */
     long tod = Native.get_simple_tod();
-    ActiveFile input_afe  = openForRead(input_fe);
+    ActiveFile input_afe = openForRead(input_fe);
     ActiveFile output_afe = openForWrite(output_fe);
 
     /* Keep writing this file until it is full: */
-    while (true)
-    {
+    while (true) {
       /* Get the next transfer size: */
       input_afe.xfersize = fwg.getXferSize();
 
@@ -88,9 +78,8 @@ class OpCopy extends FwgThread
 
       /* Get the list of keys for the output file: */
       if (Validate.isValidate())
-        output_afe.getKeyMap().storeDataBlockInfo(output_afe.next_lba,
-                                                  output_afe.xfersize,
-                                                  output_afe.getAnchor().getDVMap());
+        output_afe.getKeyMap().storeDataBlockInfo(output_afe.next_lba, output_afe.xfersize,
+            output_afe.getAnchor().getDVMap());
 
       /* Now go write the same block: */ // STILL NEED KEYS
       // the data will not really be copied with DV, a new block with the old keys
@@ -106,9 +95,9 @@ class OpCopy extends FwgThread
     }
 
     input_fe.setCopied(true);
-    input_afe  = input_afe.closeFile();
+    input_afe = input_afe.closeFile();
     output_afe = output_afe.closeFile();
-    //fwg.blocked.count(Blocked.FILE_CREATES);
+    // fwg.blocked.count(Blocked.FILE_CREATES);
     FwdStats.count(operation, tod);
     fwg.blocked.count(Blocked.FILES_COPIED);
 

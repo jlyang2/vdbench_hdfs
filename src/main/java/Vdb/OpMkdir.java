@@ -10,33 +10,24 @@ package Vdb;
 
 import java.util.Vector;
 
-
-
-class OpMkdir extends FwgThread
-{
-  private final static String c =
-  "Copyright (c) 2000, 2015, Oracle and/or its affiliates. All rights reserved.";
-
+class OpMkdir extends FwgThread {
+  private final static String c = "Copyright (c) 2000, 2015, Oracle and/or its affiliates. All rights reserved.";
 
   private boolean mkdir_max = (SlaveWorker.work.fwd_rate == RD_entry.MAX_RATE);
 
-  public OpMkdir(Task_num tn, FwgEntry fwg)
-  {
+  public OpMkdir(Task_num tn, FwgEntry fwg) {
     super(tn, fwg);
   }
 
   /**
    * Create a directory.
    */
-  protected boolean doOperation()
-  {
+  protected boolean doOperation() {
     Directory dir = null;
 
-    while (true)
-    {
-      if (SlaveJvm.isWorkloadDone())
-      {
-        //common.where();
+    while (true) {
+      if (SlaveJvm.isWorkloadDone()) {
+        // common.where();
         return false;
       }
 
@@ -45,9 +36,8 @@ class OpMkdir extends FwgThread
         return false;
 
       /* During a format we may give up as soon as the directory exists: */
-      if ((format || mkdir_max) && dir.exist())
-      {
-        //common.ptod("DIR_EXISTS: " + dir.buildFullName());
+      if ((format || mkdir_max) && dir.exist()) {
+        // common.ptod("DIR_EXISTS: " + dir.buildFullName());
         block(Blocked.DIR_EXISTS);
 
         /* During a format when (depth == 1) already exists, THIS thread is done: */
@@ -61,18 +51,16 @@ class OpMkdir extends FwgThread
       }
 
       /* Lock the directory: */
-      if (!dir.setBusy(true))
-      {
+      if (!dir.setBusy(true)) {
         block(Blocked.DIR_BUSY_MKDIR);
-        //common.ptod("DIR_BUSY_MKDIR: " + dir.buildFullName());
+        // common.ptod("DIR_BUSY_MKDIR: " + dir.buildFullName());
         continue;
       }
 
       /* If the dir exists we can blow out here already: */
-      if (dir.exist())
-      {
+      if (dir.exist()) {
         dir.setBusy(false);
-        //common.where();
+        // common.where();
         block(Blocked.DIR_EXISTS);
         if (!canWeGetMoreDirectories(msg))
           return false;
@@ -82,40 +70,33 @@ class OpMkdir extends FwgThread
       /* Need to check 'exists' again because now we're locked: */
       // duplicate!
       /*
-      if (format && dir.exist())
-      {
-        //common.ptod("format: " + format + " " + dir.getFullName());
-        dir.setBusy(false);
-        block(Blocked.DIR_EXISTS);
+       * if (format && dir.exist()) { //common.ptod("format: " + format + " " +
+       * dir.getFullName()); dir.setBusy(false); block(Blocked.DIR_EXISTS);
+       * 
+       * if (!canWeGetMoreDirectories(msg)) return false;
+       * 
+       * continue; }
+       */
 
-        if (!canWeGetMoreDirectories(msg))
-          return false;
-
-        continue;
-      } */
-
-
-      /* We also must lock the parent because someone  */
-      /* might just want to delete this parent:        */
+      /* We also must lock the parent because someone */
+      /* might just want to delete this parent: */
       // wrong: if this directory has children left we won't, and the child is
       // locked, so it can not be removed!
       // But it does not have a child YET, since we're creating it here!
-      if (!dir.getParent().setBusy(true))
-      {
+      if (!dir.getParent().setBusy(true)) {
         block(Blocked.PARENT_DIR_BUSY, dir.getFullName());
-        //common.ptod("dir  busy: " + dir.getFullName());
+        // common.ptod("dir busy: " + dir.getFullName());
         dir.setBusy(false);
         continue;
       }
 
       /* With the parent locked, we can now be sure whether it exists or not: */
       // can we do this without the lock?
-      if (!dir.getParent().exist())
-      {
+      if (!dir.getParent().exist()) {
         dir.getParent().setBusy(false);
         dir.setBusy(false);
         block(Blocked.MISSING_PARENT, dir.getFullName());
-        //common.ptod("mkdir missing parent: " + dir.getFullName());
+        // common.ptod("mkdir missing parent: " + dir.getFullName());
 
         if (format || mkdir_max)
           common.sleep_some_usecs(200);
@@ -127,19 +108,15 @@ class OpMkdir extends FwgThread
       // wrong, why check exists again, we already did that above.
       // so we'll never hit this code.
       /*
-      if (dir.exist())
-      {
-        dir.getParent().setBusy(false);
-        dir.setBusy(false);
-
-        if (!canWeGetMoreDirectories(msg))
-          return false;
-
-        //common.ptod("DIR_EXISTS: " + dir.buildFullName());
-        block(Blocked.DIR_EXISTS, dir.getDirName());
-
-        continue;
-      } */
+       * if (dir.exist()) { dir.getParent().setBusy(false); dir.setBusy(false);
+       * 
+       * if (!canWeGetMoreDirectories(msg)) return false;
+       * 
+       * //common.ptod("DIR_EXISTS: " + dir.buildFullName());
+       * block(Blocked.DIR_EXISTS, dir.getDirName());
+       * 
+       * continue; }
+       */
 
       break;
     }
@@ -155,20 +132,18 @@ class OpMkdir extends FwgThread
     dir.getParent().setBusy(false);
     dir.setBusy(false);
 
-
     return true;
   }
 
-  private void createChildren(Directory[] children)
-  {
+  private void createChildren(Directory[] children) {
     if (children == null)
       return;
 
-    for (int i = 0; i < children.length; i++)
-    {
+    for (int i = 0; i < children.length; i++) {
       /* Lock this new child. The loop is in case an other threads is trying */
       /* to create this directory also, but he'll fail since the parent is busy: */
-      while (!children[i].setBusy(true));
+      while (!children[i].setBusy(true))
+        ;
       if (children[i].createDir())
         fwg.blocked.count(Blocked.DIRECTORY_CREATES);
 
@@ -179,12 +154,8 @@ class OpMkdir extends FwgThread
     }
   }
 
-  private String[] msg =
-  {
-    "Anchor: " + fwg.anchor.getAnchorName(),
-    "Vdbench is trying to create a new directory, but all directories",
-    "already exist and no threads are currently active deleting directories."
-  };
-
+  private String[] msg = { "Anchor: " + fwg.anchor.getAnchorName(),
+      "Vdbench is trying to create a new directory, but all directories",
+      "already exist and no threads are currently active deleting directories." };
 
 }

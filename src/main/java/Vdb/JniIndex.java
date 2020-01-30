@@ -27,60 +27,51 @@ import java.util.*;
  * Workload array element.
  *
  */
-public class JniIndex
-{
-  private final static String c =
-  "Copyright (c) 2000, 2014, Oracle and/or its affiliates. All rights reserved.";
+public class JniIndex {
+  private final static String c = "Copyright (c) 2000, 2014, Oracle and/or its affiliates. All rights reserved.";
 
-  public int    jni_index;
+  public int jni_index;
   public String sd_name;
   public String wd_name;
 
-  public SdStats dlt_stats = new SdStats();  /* Passed statistics from slave to master */
-  public SdStats old_stats = new SdStats();  /* Only created on the slave              */
-
+  public SdStats dlt_stats = new SdStats(); /* Passed statistics from slave to master */
+  public SdStats old_stats = new SdStats(); /* Only created on the slave */
 
   /**
    * Create the indexes for each SD in use on this slave.
    */
-  public static void createIndexes(Work work)
-  {
+  public static void createIndexes(Work work) {
     int current_index = 0;
 
     /* Without concatenation we need only one JniIndex per WG: */
-    if (!Validate.sdConcatenation())
-    {
-      for (int i = 0; i < work.wgs_for_slave.size(); i++)
-      {
+    if (!Validate.sdConcatenation()) {
+      for (int i = 0; i < work.wgs_for_slave.size(); i++) {
         WG_entry wg = (WG_entry) work.wgs_for_slave.get(i);
         wg.jni_index_list = new ArrayList(1);
 
-        JniIndex jnx  = new JniIndex();
+        JniIndex jnx = new JniIndex();
         jnx.jni_index = current_index++;
-        jnx.sd_name   = wg.sd_used.sd_name;
-        jnx.wd_name   = wg.wd_name;
+        jnx.sd_name = wg.sd_used.sd_name;
+        jnx.wd_name = wg.wd_name;
 
         wg.jni_index_list.add(jnx);
       }
     }
 
-    else
-    {
+    else {
 
       /* With concatenation we need one JniIndex per WG per SD: */
-      for (int i = 0; i < work.wgs_for_slave.size(); i++)
-      {
-        WG_entry wg       = (WG_entry) work.wgs_for_slave.get(i);
+      for (int i = 0; i < work.wgs_for_slave.size(); i++) {
+        WG_entry wg = (WG_entry) work.wgs_for_slave.get(i);
         wg.jni_index_list = new ArrayList(wg.sds_in_concatenation.size());
 
-        for (int s = 0; s < wg.sds_in_concatenation.size(); s++)
-        {
+        for (int s = 0; s < wg.sds_in_concatenation.size(); s++) {
           SD_entry sd = wg.sds_in_concatenation.get(s);
 
-          JniIndex jnx  = new JniIndex();
+          JniIndex jnx = new JniIndex();
           jnx.jni_index = current_index++;
-          jnx.sd_name   = sd.sd_name;
-          jnx.wd_name   = wg.wd_name;
+          jnx.sd_name = sd.sd_name;
+          jnx.wd_name = wg.wd_name;
 
           wg.jni_index_list.add(jnx);
         }
@@ -88,15 +79,10 @@ public class JniIndex
     }
 
     int LIMIT = 10240;
-    if (current_index >= LIMIT)
-    {
+    if (current_index >= LIMIT) {
       common.ptod("There is a hardcoded limit of %d statistics table elements.", LIMIT);
       common.ptod("One per SD per WD");
-      common.failure("Maximum current jni_index value is %d, it currently is %d. Contact Henk",
-                     LIMIT,
-                     current_index);
+      common.failure("Maximum current jni_index value is %d, it currently is %d. Contact Henk", LIMIT, current_index);
     }
   }
 }
-
-

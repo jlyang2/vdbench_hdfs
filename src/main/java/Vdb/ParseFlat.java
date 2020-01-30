@@ -12,33 +12,29 @@ import java.io.File;
 import java.util.*;
 import Utils.*;
 
+public class ParseFlat {
+  private final static String c = "Copyright (c) 2000, 2013, Oracle and/or its affiliates. All rights reserved.";
 
-public class ParseFlat
-{
-  private final static String c =
-  "Copyright (c) 2000, 2013, Oracle and/or its affiliates. All rights reserved.";
+  private static boolean quiet = false;
+  private static boolean comma = true;
+  private static String input_file = null;
+  private static String output_file = "-";
+  private static String label_file = null;
 
-  private static boolean quiet          = false;
-  private static boolean comma          = true;
-  private static String  input_file     = null;
-  private static String  output_file    = "-";
-  private static String  label_file     = null;
-
-  private static boolean average        = false;
-  private static Vector  <String[]> split_data     = new    Vector(256);
-  private static Vector  <String> column_names   = new    Vector(36);
-  private static Vector  <String> filter_columns = new    Vector(36);
-  private static Vector  <String> filter_values  = new    Vector(36);
-  private static Vector  <String> output_cols    = new    Vector(36);
+  private static boolean average = false;
+  private static Vector<String[]> split_data = new Vector(256);
+  private static Vector<String> column_names = new Vector(36);
+  private static Vector<String> filter_columns = new Vector(36);
+  private static Vector<String> filter_values = new Vector(36);
+  private static Vector<String> output_cols = new Vector(36);
 
   private static boolean all_columns = false;
 
   /**
-  * Usage: ParseFlat flatfile.html
-  *     output.txt col1 xxx col2 yyy .... data rate resp
+   * Usage: ParseFlat flatfile.html output.txt col1 xxx col2 yyy .... data rate
+   * resp
    */
-  public static void main(String[] args) throws Exception
-  {
+  public static void main(String[] args) throws Exception {
     /* Parse all input parameters: */
     scanParms(args);
 
@@ -53,8 +49,7 @@ public class ParseFlat
     /* Read the possible column names from flatfile: */
     readColumnHeadersAndData();
 
-    if (output_cols.size() == 1 && output_cols.get(0).equals("all"))
-    {
+    if (output_cols.size() == 1 && output_cols.get(0).equals("all")) {
       output_cols.clear();
       for (String col : column_names)
         output_cols.add(col);
@@ -70,18 +65,15 @@ public class ParseFlat
     common.ptod("ParseFlat completed successfully.");
   }
 
-  private static void readColumnHeadersAndData()
-  {
+  private static void readColumnHeadersAndData() {
     /* Find the first line that starts with a blank: */
     Fget fg = new Fget(input_file);
     String line = null;
-    while ((line = fg.get()) != null)
-    {
-      //common.ptod("line: " + line);
+    while ((line = fg.get()) != null) {
+      // common.ptod("line: " + line);
       if (line.trim().length() == 0)
         continue;
-      if (line.startsWith(" "))
-      {
+      if (line.startsWith(" ")) {
         /* That line contains all the proper column names in the right order: */
         String[] split = line.trim().split(" +");
         for (int i = 0; i < split.length; i++)
@@ -91,20 +83,16 @@ public class ParseFlat
     }
 
     /* Now copy (as split) all the data rows into the 'data' Vector: */
-    while ((line = fg.get()) != null)
-    {
-      if (!line.startsWith("*"))
-      {
+    while ((line = fg.get()) != null) {
+      if (!line.startsWith("*")) {
         String[] split = line.trim().split(" +");
 
-        if (split.length != column_names.size())
-        {
+        if (split.length != column_names.size()) {
           common.ptod("line: " + line);
           common.ptod("ParseFlat: data line incomplete, expecting %d columns, getting %d. Line ignored.",
-                      column_names.size(), split.length);
+              column_names.size(), split.length);
           common.ptod("This is acceptable for the last line in the file.");
-        }
-        else
+        } else
           split_data.add(split);
       }
     }
@@ -112,20 +100,15 @@ public class ParseFlat
     fg.close();
   }
 
-  private static void checkColumnNames(Vector list)
-  {
-    loop:
-    for (int i = 0; i < list.size(); i++)
-    {
+  private static void checkColumnNames(Vector list) {
+    loop: for (int i = 0; i < list.size(); i++) {
       String col = (String) list.elementAt(i);
       findColumnNo(col);
     }
   }
 
-  private static int findColumnNo(String col)
-  {
-    for (int j = 0; j < column_names.size(); j++)
-    {
+  private static int findColumnNo(String col) {
+    for (int j = 0; j < column_names.size(); j++) {
       String name = (String) column_names.elementAt(j);
       if (col.equalsIgnoreCase(name))
         return j;
@@ -135,15 +118,13 @@ public class ParseFlat
     return 0;
   }
 
-  private static void createOutput()
-  {
+  private static void createOutput() {
     int count = 0;
     Fput fp = new Fput(output_file);
 
     /* Start with writing column headers: */
     String txt = "";
-    for (int j = 0; j < output_cols.size(); j++)
-    {
+    for (int j = 0; j < output_cols.size(); j++) {
       String colname = (String) output_cols.elementAt(j);
       if (j > 0)
         txt += (comma) ? "," : "\t";
@@ -154,24 +135,20 @@ public class ParseFlat
     /* Remove all 'format=' runs: */
     // Removed 9/12/17. Did not remember why I did this in the first place.
     // Having ONLY a format caused parse to abort 'no data'.
-    //removeFormat();
+    // removeFormat();
 
     /* Remove/keep 'avg_' line: */
     checkAverage();
 
     /* Go through each data line: */
-    loop:
-    for (int i = 0; i < split_data.size(); i++)
-    {
-      try
-      {
+    loop: for (int i = 0; i < split_data.size(); i++) {
+      try {
 
         String[] split = (String[]) split_data.elementAt(i);
 
         /* Look for a match with all 'columns' and 'filters': */
         boolean match = true;
-        for (int j = 0; j < filter_columns.size(); j++)
-        {
+        for (int j = 0; j < filter_columns.size(); j++) {
           String col = (String) filter_columns.elementAt(j);
           int colno = findColumnNo(col);
           if (!split[colno].equalsIgnoreCase((String) filter_values.elementAt(j)))
@@ -179,14 +156,12 @@ public class ParseFlat
         }
 
         /* If all the filters match, use this data: */
-        if (match)
-        {
+        if (match) {
           txt = "";
-          for (int j = 0; j < output_cols.size(); j++)
-          {
+          for (int j = 0; j < output_cols.size(); j++) {
             String colname = (String) output_cols.elementAt(j);
-            int colno      = findColumnNo(colname);
-            String data    = split[colno];
+            int colno = findColumnNo(colname);
+            String data = split[colno];
             if (data.equals("?"))
               data = "0";
 
@@ -195,8 +170,7 @@ public class ParseFlat
             txt += data;
 
             /* Decide whether to use this interval: */
-            if (colname.equalsIgnoreCase("interval"))
-            {
+            if (colname.equalsIgnoreCase("interval")) {
               if (!average && data.startsWith("avg"))
                 continue loop;
               if (average && !data.startsWith("avg"))
@@ -209,8 +183,7 @@ public class ParseFlat
         }
       }
 
-      catch (Exception e)
-      {
+      catch (Exception e) {
         for (int l = 0; l < split_data.get(i).length; l++)
           common.ptod("Failed column: %2d: ", l, split_data.get(i)[l]);
 
@@ -224,51 +197,40 @@ public class ParseFlat
       common.failure("No output written. Check column names and filters");
   }
 
-
-  private static void removeFormat()
-  {
+  private static void removeFormat() {
     int count = 0;
     /* Remove all 'format=' runs: */
-    for (int i = 0; i < split_data.size(); i++)
-    {
+    for (int i = 0; i < split_data.size(); i++) {
       String[] split = (String[]) split_data.elementAt(i);
       int run = findColumnNo("run");
-      if (split[run].startsWith(RD_entry.FSD_FORMAT_RUN))
-      {
+      if (split[run].startsWith(RD_entry.FSD_FORMAT_RUN)) {
         count++;
         split_data.removeElementAt(i--);
       }
     }
 
     if (count > 0)
-      common.ptod("Flatfile parser removed all Run Definitions starting with '%s'",
-                  RD_entry.FSD_FORMAT_RUN);
+      common.ptod("Flatfile parser removed all Run Definitions starting with '%s'", RD_entry.FSD_FORMAT_RUN);
   }
 
-  private static void checkAverage()
-  {
+  private static void checkAverage() {
     /* Remove all 'format=' runs: */
-    for (int i = 0; i < split_data.size(); i++)
-    {
+    for (int i = 0; i < split_data.size(); i++) {
       String[] split = (String[]) split_data.elementAt(i);
       int interval = findColumnNo("interval");
       String data = split[interval];
-      if (!average && data.startsWith("avg"))
-      {
+      if (!average && data.startsWith("avg")) {
         split_data.removeElementAt(i--);
         continue;
       }
-      if (average && !data.startsWith("avg"))
-      {
+      if (average && !data.startsWith("avg")) {
         split_data.removeElementAt(i--);
         continue;
       }
     }
   }
 
-
-  private static void usage(String txt)
-  {
+  private static void usage(String txt) {
     common.ptod("");
     common.ptod("");
     common.ptod("");
@@ -288,21 +250,16 @@ public class ParseFlat
     common.failure(txt);
   }
 
-
-  private static void scanParms(String[] argsin)
-  {
+  private static void scanParms(String[] argsin) {
     Vector parms = new Vector(64);
 
     /* Take all parameters and replace possible '-frun' with '-f run': */
-    for (int i = 1; i < argsin.length; i++)
-    {
+    for (int i = 1; i < argsin.length; i++) {
       String arg = argsin[i];
-      if (arg.startsWith("-") && arg.length() > 2)
-      {
-        parms.add(arg.substring(0,2));
+      if (arg.startsWith("-") && arg.length() > 2) {
+        parms.add(arg.substring(0, 2));
         parms.add(arg.substring(2));
-      }
-      else if (arg.startsWith("-q"))
+      } else if (arg.startsWith("-q"))
         quiet = true;
       else if (arg.startsWith("-t"))
         comma = false;
@@ -313,38 +270,34 @@ public class ParseFlat
     String[] args = (String[]) parms.toArray(new String[0]);
 
     /* Print arguments: */
-    if (!quiet)
-    {
+    if (!quiet) {
       System.err.println("vdbench parseflat arguments:");
       for (int i = 0; i < args.length; i++)
         System.err.println("Argument " + i + ": " + args[i]);
     }
 
     /* Now do the parsing: */
-    for (int i = 0; i < args.length; i++)
-    {
-      //common.ptod("args: " + args[i]);
+    for (int i = 0; i < args.length; i++) {
+      // common.ptod("args: " + args[i]);
       /* Input file: */
-      if (args[ i ].startsWith("-i"))
+      if (args[i].startsWith("-i"))
         input_file = args[++i];
 
       /* Output file: */
-      else if (args[ i ].startsWith("-o"))
+      else if (args[i].startsWith("-o"))
         output_file = args[++i];
 
       /* Filters: */
-      else if (args[i].startsWith("-f"))
-      {
-        for (i++; i < args.length && !args[i].startsWith("-"); )
-        {
-          filter_columns.add(args[ i++ ]);
-          //common.ptod("columns: " + filter_columns.lastElement());
+      else if (args[i].startsWith("-f")) {
+        for (i++; i < args.length && !args[i].startsWith("-");) {
+          filter_columns.add(args[i++]);
+          // common.ptod("columns: " + filter_columns.lastElement());
 
           if (i == args.length)
             usage("'-f' filters must be specified in pairs");
 
-          filter_values.add (args[ i++ ]);
-          //common.ptod("values:  " + filter_values.lastElement());
+          filter_values.add(args[i++]);
+          // common.ptod("values: " + filter_values.lastElement());
         }
 
         /* Back off one: */
@@ -352,10 +305,8 @@ public class ParseFlat
       }
 
       /* Data columns: */
-      else if (args[i].startsWith("-c"))
-      {
-        for (int j = i+1; j < args.length && !args[j].startsWith("-"); j++)
-        {
+      else if (args[i].startsWith("-c")) {
+        for (int j = i + 1; j < args.length && !args[j].startsWith("-"); j++) {
           if (args[j].equals("all"))
             all_columns = true;
           output_cols.add(args[++i]);
@@ -385,8 +336,7 @@ public class ParseFlat
       usage("No data columns specified '-c xxx yyy zzz'");
 
     /* if the input is a directory, try flatfile: */
-    if (Fget.dir_exists(input_file))
-    {
+    if (Fget.dir_exists(input_file)) {
       if (Fget.file_exists(input_file, "flatfile.html"))
         input_file = new File(input_file, "flatfile.html").getAbsolutePath();
     }

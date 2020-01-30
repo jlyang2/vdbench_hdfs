@@ -18,95 +18,83 @@ import java.util.Vector;
 import Utils.ClassPath;
 import Utils.Fget;
 
-
 /**
  * This class contains information about Replay that needs to be passed back and
  * forth from Master to Slaves.
  */
-public class ReplayInfo implements Serializable
-{
-  private final static String c =
-  "Copyright (c) 2000, 2014, Oracle and/or its affiliates. All rights reserved.";
+public class ReplayInfo implements Serializable {
+  private final static String c = "Copyright (c) 2000, 2014, Oracle and/or its affiliates. All rights reserved.";
 
-  private boolean replay     = false;
-  private int     repeat     = 1;
-  private String  replay_filename;
-  private String  split_directory;
-  private double  replay_adjust;
+  private boolean replay = false;
+  private int repeat = 1;
+  private String replay_filename;
+  private String split_directory;
+  private double replay_adjust;
   private boolean duplication = false;
-  private long    stagger     = 0;
-  private boolean compress   = true;
+  private long stagger = 0;
+  private boolean compress = true;
 
-  private long    low_start_filter  = 0;
-  private long    high_start_filter = Long.MAX_VALUE;
-  private long    lba_fold_size     = Long.MAX_VALUE;
+  private long low_start_filter = 0;
+  private long high_start_filter = Long.MAX_VALUE;
+  private long lba_fold_size = Long.MAX_VALUE;
 
-  private HashMap <Long, ReplayDevice> device_map = new HashMap(64);
+  private HashMap<Long, ReplayDevice> device_map = new HashMap(64);
 
-  private Vector  group_list = new Vector(16, 0);
+  private Vector group_list = new Vector(16, 0);
 
+  private static ReplayInfo info = new ReplayInfo();
 
-
-  private static  ReplayInfo info = new ReplayInfo();
-
-
-
-  public static ReplayInfo getInfo()
-  {
+  public static ReplayInfo getInfo() {
     return info;
   }
-  public static void setInfo(ReplayInfo i)
-  {
+
+  public static void setInfo(ReplayInfo i) {
     info = i;
   }
 
-  public static void setReplay()
-  {
-    if (!info.replay)
-    {
+  public static void setReplay() {
+    if (!info.replay) {
       info.replay = true;
       info.findFilter();
     }
   }
-  public static boolean isReplay()
-  {
+
+  public static boolean isReplay() {
     return info.replay;
   }
-  public static int getRepeatCount()
-  {
+
+  public static int getRepeatCount() {
     return info.repeat;
   }
-  public static HashMap getDeviceMap()
-  {
+
+  public static HashMap getDeviceMap() {
     return info.device_map;
   }
-  public static long getLowFilter()
-  {
-    return info. low_start_filter;
+
+  public static long getLowFilter() {
+    return info.low_start_filter;
   }
-  public static long getHighFilter()
-  {
+
+  public static long getHighFilter() {
     return info.high_start_filter;
   }
-  public static long getFoldSize()
-  {
+
+  public static long getFoldSize() {
     return info.lba_fold_size;
   }
-  public static Vector getGroupList()
-  {
+
+  public static Vector getGroupList() {
     return info.group_list;
   }
 
   /**
-   * Return ALL devices, real devices and duplicates
-   * Sort by device number
+   * Return ALL devices, real devices and duplicates Sort by device number
    *
-   * This method may not be static because InfoFromHost.possibleReplayInfo()
-   * will call this when using the copy of ReplayInfo RETURNED from the slaves,
-   * and therefore NOT the current local copy residing in the Master.
+   * This method may not be static because InfoFromHost.possibleReplayInfo() will
+   * call this when using the copy of ReplayInfo RETURNED from the slaves, and
+   * therefore NOT the current local copy residing in the Master.
    */
-  public Vector <ReplayDevice> getDeviceList()
-  {
+  public Vector<ReplayDevice> getDeviceList() {
     Long[] devnumbers = (Long[]) device_map.keySet().toArray(new Long[0]);
     java.util.Arrays.sort(devnumbers);
     Vector device_list = new Vector(devnumbers.length);
@@ -115,75 +103,62 @@ public class ReplayInfo implements Serializable
     return device_list;
   }
 
-  public static Vector <ReplayDevice> getNodupDevs()
-  {
+  public static Vector<ReplayDevice> getNodupDevs() {
     Long[] devnumbers = (Long[]) info.device_map.keySet().toArray(new Long[0]);
     java.util.Arrays.sort(devnumbers);
     Vector device_list = new Vector(devnumbers.length);
-    for (int i = 0; i < devnumbers.length; i++)
-    {
+    for (int i = 0; i < devnumbers.length; i++) {
       ReplayDevice rdev = info.device_map.get(devnumbers[i]);
-      if (rdev.getDuplicateNumber() == 0)
-      {
-        //common.ptod("getNodupDevs: " + rdev.getDevString() + " " + rdev.getDuplicateNumber());
+      if (rdev.getDuplicateNumber() == 0) {
+        // common.ptod("getNodupDevs: " + rdev.getDevString() + " " +
+        // rdev.getDuplicateNumber());
         device_list.add(rdev);
       }
     }
     return device_list;
   }
 
-  public static Vector <ReplayDevice> getDupDevs()
-  {
+  public static Vector<ReplayDevice> getDupDevs() {
     Long[] devnumbers = (Long[]) info.device_map.keySet().toArray(new Long[0]);
     java.util.Arrays.sort(devnumbers);
     Vector device_list = new Vector(devnumbers.length);
-    for (int i = 0; i < devnumbers.length; i++)
-    {
+    for (int i = 0; i < devnumbers.length; i++) {
       ReplayDevice rdev = info.device_map.get(devnumbers[i]);
-      if (rdev.getDuplicateNumber() != 0)
-      {
-        //common.ptod("getNodupDevs: " + rdev.getDevString() + " " + rdev.getDuplicateNumber());
+      if (rdev.getDuplicateNumber() != 0) {
+        // common.ptod("getNodupDevs: " + rdev.getDevString() + " " +
+        // rdev.getDuplicateNumber());
         device_list.add(rdev);
       }
     }
     return device_list;
   }
-
-
 
   /**
    * Store the replay parameters.
    *
-   * There can be 'n' parameters: the first one always is the replay file
-   * name, but the others can be a mix.
+   * There can be 'n' parameters: the first one always is the replay file name,
+   * but the others can be a mix.
    *
-   * Replay=(flatfile.bin.gz,repeat=n,split=x,duplication=y,stagger=n)
-   * - repeat=n:      how often to repeat this replay run
-   * - split=x:       split directory
-   * - duplication=y: Use Replay duplication
-   * - stagger=n:     for duplicates, how many milliseconds to stagger start
-   *   time
-   * - compress=no   (do not gzip).
+   * Replay=(flatfile.bin.gz,repeat=n,split=x,duplication=y,stagger=n) - repeat=n:
+   * how often to repeat this replay run - split=x: split directory -
+   * duplication=y: Use Replay duplication - stagger=n: for duplicates, how many
+   * milliseconds to stagger start time - compress=no (do not gzip).
    *
    * This method could be static, but I am too lazy to change the code... :-)
    */
-  public void parseParameters(String[] names)
-  {
+  public void parseParameters(String[] names) {
     /* The first parameter is always the replay file: */
     replay_filename = names[0];
 
     if (!new File(replay_filename).exists())
-      common.failure("storeParameters(names): replay file name does not exist: " +
-                     replay_filename);
+      common.failure("storeParameters(names): replay file name does not exist: " + replay_filename);
 
     /* Set the default split directory: */
     split_directory = new File(replay_filename).getAbsoluteFile().getParent();
 
     /* If we have multiple parameters: */
-    if (names.length > 1)
-    {
-      for (int i = 1; i < names.length; i++)
-      {
+    if (names.length > 1) {
+      for (int i = 1; i < names.length; i++) {
         String parm = names[i].trim();
         String[] split = parm.split("=");
         if (split.length != 2)
@@ -212,64 +187,53 @@ public class ReplayInfo implements Serializable
     /* Make sure the split directory is there, create it if needed: */
     File dirptr = new File(split_directory);
     if (dirptr.exists() && !dirptr.isDirectory())
-      common.failure("Replay file target directory %s exists but is not a directory",
-                     split_directory);
+      common.failure("Replay file target directory %s exists but is not a directory", split_directory);
     else if (!dirptr.exists() && !dirptr.mkdir())
-      common.failure("Replay file target directory %s can not be created",
-                     split_directory);
+      common.failure("Replay file target directory %s can not be created", split_directory);
 
   }
 
-  public static String getReplayFile()
-  {
+  public static String getReplayFile() {
     return info.replay_filename;
   }
 
-  public static String getSplitDirectory()
-  {
+  public static String getSplitDirectory() {
     return info.split_directory;
   }
 
-  public static void setAdjustValue(double d)
-  {
+  public static void setAdjustValue(double d) {
     info.replay_adjust = d;
   }
-  public static double getAdjustValue()
-  {
+
+  public static double getAdjustValue() {
     return info.replay_adjust;
   }
 
-  public static boolean duplicationNeeded()
-  {
+  public static boolean duplicationNeeded() {
     return info.duplication;
   }
-  public static long getStagger()
-  {
+
+  public static long getStagger() {
     return info.stagger;
   }
-  public static boolean compress()
-  {
+
+  public static boolean compress() {
     return info.compress;
   }
 
-
   /**
    * Read file 'replay_filter'. This will allow you to set a beginning and end
-   * time stamp for inoput data selection.
-   * It also allows for a folding of the maximum lba, allowing testing against
-   * smaller luns.
+   * time stamp for inoput data selection. It also allows for a folding of the
+   * maximum lba, allowing testing against smaller luns.
    *
    * This information has been moved from 'replay_filter.txt' to using the
    * MiscParms 'misc=' parameter.
    */
-  private void findFilter()
-  {
-    ArrayList <String[]> misc = MiscParms.getMiscellaneous();
+  private void findFilter() {
+    ArrayList<String[]> misc = MiscParms.getMiscellaneous();
 
-    for (String[] array : misc)
-    {
-      for (String parm : array)
-      {
+    for (String[] array : misc) {
+      for (String parm : array) {
         String[] split = parm.trim().split("=");
 
         if (parm.startsWith("low_start_filter") && split.length == 2)
@@ -281,7 +245,9 @@ public class ReplayInfo implements Serializable
         else if (parm.startsWith("lba_fold_size_mb") && split.length == 2)
           lba_fold_size = Long.parseLong(split[1]) * 1024 * 1024;
 
-        /* Anything 'else' is possibly not meant for ME, so I can not display an error! */
+        /*
+         * Anything 'else' is possibly not meant for ME, so I can not display an error!
+         */
         else
           continue;
 

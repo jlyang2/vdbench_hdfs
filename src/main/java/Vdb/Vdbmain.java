@@ -19,120 +19,105 @@ import Utils.Fput;
 import Utils.Fget;
 import Utils.Semaphore;
 
-
-
 /**
  * Main method for vdbench workload Generator, see main() for overview.
  */
-public class Vdbmain
-{
-  private final static String c =
-  "Copyright (c) 2000, 2018, Oracle and/or its affiliates. All rights reserved.";
+public class Vdbmain {
+  private final static String c = "Copyright (c) 2000, 2018, Oracle and/or its affiliates. All rights reserved.";
 
-  static Vector <SD_entry> sd_list  = new Vector(64, 0); /* List of Storage Definitions  */
-  static Vector <SD_entry> csd_list = new Vector(8);
-  static Vector <WD_entry> wd_list  = new Vector(64, 0); /* List of Workload Definitions */
-  static Vector <RD_entry> rd_list  = new Vector(64, 0); /* List of Run Definitions      */
+  static Vector<SD_entry> sd_list = new Vector(64, 0); /* List of Storage Definitions */
+  static Vector<SD_entry> csd_list = new Vector(8);
+  static Vector<WD_entry> wd_list = new Vector(64, 0); /* List of Workload Definitions */
+  static Vector<RD_entry> rd_list = new Vector(64, 0); /* List of Run Definitions */
 
   private static boolean workload_done;
   private static Semaphore workload_done_semaphore = new Semaphore(0);
 
   static boolean fwd_workload = false;
 
-  static boolean simulate       = false;
-  static String  pdm_output     = null;
-  static String  output_dir     = "output";
+  static boolean simulate = false;
+  static String pdm_output = null;
+  static String output_dir = "output";
   static PrintWriter parms_report;
 
   static boolean slaves_started = false;
 
   static double observed_iorate = 10000;
-  static double observed_resp   = 0;
-  static double last_curve_max  = 10000;
+  static double observed_resp = 0;
+  static double last_curve_max = 10000;
 
-  static int elapsed  =  0;
-  static int warmup   =  0;
-  static int interval =  0;
+  static int elapsed = 0;
+  static int warmup = 0;
+  static int interval = 0;
 
   public static String rd_parm_extras = "";
 
-  static boolean force_fsd_cleanup    = false;
-  static boolean force_format_only    = false;
-  static boolean force_format_no      = false;
-  static boolean force_format_yes     = false;
+  static boolean force_fsd_cleanup = false;
+  static boolean force_format_only = false;
+  static boolean force_format_no = false;
+  static boolean force_format_yes = false;
 
-  static boolean loop_all_runs        = false;
-  static long    loop_duration        = Long.MAX_VALUE;
-  static long    loop_count           = Long.MAX_VALUE;
-  static long    loops_done           = 0;
+  static boolean loop_all_runs = false;
+  static long loop_duration = Long.MAX_VALUE;
+  static long loop_count = Long.MAX_VALUE;
+  static long loops_done = 0;
 
-  static boolean checking_for_errors  = true;
+  static boolean checking_for_errors = true;
 
   private static Vector parm_files;
 
   public static volatile boolean vdbench_ended = false;
 
-
   static boolean kstat_console = false;
   static boolean isHDFS = false;
 
-
   /* Unique run time value to make sure we don't fiddle with */
-  /* old masters and slaves                                  */
-  private static String run_time = new SimpleDateFormat("yyMMdd-HH.mm.ss.SSS" ).format(new Date());
+  /* old masters and slaves */
+  private static String run_time = new SimpleDateFormat("yyMMdd-HH.mm.ss.SSS").format(new Date());
 
-  public static String getRunTime()
-  {
+  public static String getRunTime() {
     return run_time;
   }
 
-
-  public static boolean isWorkloadDone()
-  {
+  public static boolean isWorkloadDone() {
     return workload_done;
   }
-  public static void setWorkloadDone(boolean bool)
-  {
+
+  public static void setWorkloadDone(boolean bool) {
     workload_done = bool;
     if (workload_done)
       workload_done_semaphore.release();
-    //if (bool)
-    //  common.where(8);
+    // if (bool)
+    // common.where(8);
   }
-  public static void waitWorkloadDone()
-  {
-    try
-    {
+
+  public static void waitWorkloadDone() {
+    try {
       workload_done_semaphore.acquire();
-    }
-    catch (InterruptedException e)
-    {
+    } catch (InterruptedException e) {
     }
   }
 
-
-  public static void print_property(String prop)
-  {
+  public static void print_property(String prop) {
     common.plog(Format.f("%-30s", prop) + System.getProperty(prop));
   }
 
   /**
    * Print Java properties
    */
-  public static void print_system()
-  {
+  public static void print_system() {
     print_property("java.vendor");
-    //print_property("java.vendor.url");
+    // print_property("java.vendor.url");
     print_property("java.home");
     print_property("java.vm.specification.version");
-    //print_property("java.vm.specification.vendor");
-    //print_property("java.vm.specification.name");
+    // print_property("java.vm.specification.vendor");
+    // print_property("java.vm.specification.name");
     print_property("java.vm.version");
     print_property("java.vm.vendor");
-    //print_property("java.vm.name");
+    // print_property("java.vm.name");
     print_property("java.specification.version");
-    //print_property("java.specification.vendor");
-    //print_property("java.specification.name");
+    // print_property("java.specification.vendor");
+    // print_property("java.specification.name");
     print_property("java.class.version");
     print_property("user.name");
     print_property("user.dir");
@@ -142,23 +127,19 @@ public class Vdbmain
     print_property("os.arch");
     print_property("os.version");
     print_property("sun.arch.data.model");
-    //print_property("file.separator");
-    //print_property("path.separator");
-    //print_property("line.separator");
-    //print_property("user.home");
-    //print_property("user.dir");
+    // print_property("file.separator");
+    // print_property("path.separator");
+    // print_property("line.separator");
+    // print_property("user.home");
+    // print_property("user.dir");
 
     /* Extra info to display possible fixes: */
-    if (!Dist.version.equals("Henk's personal development library"))
-    {
+    if (!Dist.version.equals("Henk's personal development library")) {
       File[] dirptrs = new File(ClassPath.classPath("classes")).listFiles();
-      if (dirptrs != null)
-      {
-        for (File dirptr : dirptrs)
-        {
+      if (dirptrs != null) {
+        for (File dirptr : dirptrs) {
           File[] fptrs = new File(dirptr.getAbsolutePath()).listFiles();
-          if (fptrs != null)
-          {
+          if (fptrs != null) {
             for (File fptr : fptrs)
               common.plog("Fixes: %s/%s %d", dirptr.getName(), fptr.getName(), fptr.length());
           }
@@ -171,53 +152,43 @@ public class Vdbmain
   /**
    * Open some reporting files
    */
-  public static void open_print_files()
-  {
+  public static void open_print_files() {
     Report summary_report = Report.getSummaryReport();
     ErrorLog.create();
 
     summary_report.printHtmlLink("Link to errorlog", "errorlog", "errorlog");
     summary_report.printHtmlLink("Link to flatfile", "flatfile", "flatfile");
-    if (Vdbmain.isFwdWorkload())
-    {
+    if (Vdbmain.isFwdWorkload()) {
       summary_report.printHtmlLink("Link to anchor status", "anchors", "anchors");
       FwdStats.defineNamedData(output_dir);
     }
   }
 
   /**
-   * Concatenate parameters that do not have a '-' to the previous one.
-   * We only do that once. As soon as we hit a standalone ' - ' we stop.
-   * (Everything following the standalone '-' goes to parmfile).
-   * This was written to allow any parameter to be either -xYY or -x YY
+   * Concatenate parameters that do not have a '-' to the previous one. We only do
+   * that once. As soon as we hit a standalone ' - ' we stop. (Everything
+   * following the standalone '-' goes to parmfile). This was written to allow any
+   * parameter to be either -xYY or -x YY
    *
-   * Any parameter of with contents xx=yy will not be treated this way, it will
-   * be used later on as a parameter substitution, replacing $xx with 'yy'.
+   * Any parameter of with contents xx=yy will not be treated this way, it will be
+   * used later on as a parameter substitution, replacing $xx with 'yy'.
    */
-  private static void check_args(String args[])
-  {
+  private static void check_args(String args[]) {
     String newargs[] = new String[1024];
     int out = 0;
     boolean concatenated = false;
     boolean standalone_dash = false;
 
-    for (int i = 0; i < args.length; i++)
-    {
+    for (int i = 0; i < args.length; i++) {
       /* A '+' will be an addition to a one-line RD parameter: */
-      if (args[i].startsWith("+") )
-      {
+      if (args[i].startsWith("+")) {
         saveRdExtras(args, i);
         break;
       }
 
-      if (i == 0                    ||
-          args[i].startsWith("-")   ||
-          concatenated              ||
-          standalone_dash           ||
-          !newargs[out-1].startsWith("-") ||
-          (newargs[out-1].startsWith("-f") && newargs[out-1].length() != 2) ||
-          (newargs[out-1].startsWith("-o") && newargs[out-1].length() != 2) )
-      {
+      if (i == 0 || args[i].startsWith("-") || concatenated || standalone_dash || !newargs[out - 1].startsWith("-")
+          || (newargs[out - 1].startsWith("-f") && newargs[out - 1].length() != 2)
+          || (newargs[out - 1].startsWith("-o") && newargs[out - 1].length() != 2)) {
         if (args[i].compareTo("-") == 0)
           standalone_dash = true;
         newargs[out++] = args[i];
@@ -227,9 +198,8 @@ public class Vdbmain
       else if (args[i].indexOf("=") != -1)
         newargs[out++] = args[i];
 
-      else
-      {
-        newargs[out-1] = newargs[out-1] + args[i];
+      else {
+        newargs[out - 1] = newargs[out - 1] + args[i];
         concatenated = true;
       }
     }
@@ -238,23 +208,22 @@ public class Vdbmain
     System.arraycopy(newargs, 0, nargs, 0, out);
 
     /* We need the output directory ASAP: */
-    for (int i = 0; i < nargs.length; i++)
-    {
+    for (int i = 0; i < nargs.length; i++) {
       if (nargs[i].startsWith("-o"))
         output_dir = nargs[i].substring(2);
-      else if (nargs[i].compareTo("-s") == 0 )
+      else if (nargs[i].compareTo("-s") == 0)
         simulate = true;
     }
 
     // Removed as per 50407 because of java 1.10.x
-    //checkJavaVersion();
+    // checkJavaVersion();
 
     /* PDM may have overridden the output directory name: */
     if (pdm_output != null)
       output_dir = pdm_output;
 
     /* Create requested directory. Delete files inside if it already exists: */
-    output_dir      = reporting.rep_mkdir(output_dir);
+    output_dir = reporting.rep_mkdir(output_dir);
     PdmStart.setOutputDir(output_dir);
     Validate.setOutput(output_dir);
     common.log_html = Report.createHmtlFile("logfile");
@@ -263,12 +232,11 @@ public class Vdbmain
 
     /* Open summary file as early as possible: */
     String txt = c + "\nVdbench summary report, created ";
-    SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss MMM dd yyyy zzz"  );
-    SimpleDateFormat df2 = new SimpleDateFormat("HH:mm:ss MMM dd yyyy zzz"  );
+    SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss MMM dd yyyy zzz");
+    SimpleDateFormat df2 = new SimpleDateFormat("HH:mm:ss MMM dd yyyy zzz");
     df2.setTimeZone(TimeZone.getTimeZone("UTC"));
     common.summ_html = Report.createHmtlFile("summary.html",
-                                             txt + df.format(new Date()) +
-                                             " (" + df2.format(new Date()) + ")");
+        txt + df.format(new Date()) + " (" + df2.format(new Date()) + ")");
 
     Report.setSummaryReport(new Report(common.summ_html, "summary", "common.summ_html"));
     Report.getSummaryReport().printHtmlLink("Link to logfile", "logfile", "logfile");
@@ -287,29 +255,26 @@ public class Vdbmain
 
     print_system();
 
-    //Utils.ClassPath.reportVdbenchScript();
+    // Utils.ClassPath.reportVdbenchScript();
   }
-
 
   /**
    * Scan execution parameters
    */
-  public static void scan_args(String args[])
-  {
+  public static void scan_args(String args[]) {
     parm_files = new Vector(8, 0);
 
     /* First scan looks only for -o parameter so that we can get the name: */
-    for (int i = 0; i < args.length; i++)
-    {
-      String thisarg = args[ i ];
+    for (int i = 0; i < args.length; i++) {
+      String thisarg = args[i];
       if (thisarg == null)
         break;
 
       /* we already picked up the directory: */
-      if (thisarg.startsWith("-o") )
+      if (thisarg.startsWith("-o"))
         continue;
 
-      else if (thisarg.compareTo("-s") == 0 )
+      else if (thisarg.compareTo("-s") == 0)
         continue;
     }
 
@@ -317,8 +282,7 @@ public class Vdbmain
     boolean scan_for_parmfile = false;
 
     /* Do a very quick test to a temp file if requested: */
-    for (int i = 0; i < args.length; i++)
-    {
+    for (int i = 0; i < args.length; i++) {
       if (args[i].startsWith("-t"))
         args[i] = "-f" + createQuickTest(args[i]);
 
@@ -328,68 +292,73 @@ public class Vdbmain
     }
 
     /* Scan all parameters: */
-    for (int i = 0; i < args.length; i++)
-    {
-      String thisarg = args[ i ];
+    for (int i = 0; i < args.length; i++) {
+      String thisarg = args[i];
 
       if (thisarg == null)
         break;
 
       common.ptod("input argument scanned: '" + thisarg + "'");
 
-      if (thisarg.indexOf("=") != -1)
-      {
+      if (thisarg.indexOf("=") != -1) {
         InsertHosts.addSubstitute(thisarg);
         scan_for_parmfile = true;
         continue;
       }
 
       /* -f parameter allows multiple filenames: */
-      if (thisarg.startsWith("-f") )
-      {
+      if (thisarg.startsWith("-f")) {
         parm_files.add(thisarg.substring(2));
         scan_for_parmfile = true;
         continue;
       }
 
-      else if (scan_for_parmfile && !thisarg.startsWith("-") )
-      {
+      else if (scan_for_parmfile && !thisarg.startsWith("-")) {
         parm_files.add(thisarg);
         continue;
       }
       scan_for_parmfile = false;
 
-      if (thisarg.startsWith("-o"))  // we already did '-o'
+      if (thisarg.startsWith("-o")) // we already did '-o'
       {
       }
 
-      else if (thisarg.startsWith("-j"))
-      {
+      else if (thisarg.startsWith("-j")) {
         Validate.setValidate();
         Validate.setJournaling();
 
-        if (thisarg.contains("r")) Validate.setJournalRecovery();
-        if (thisarg.contains("n")) Validate.setNoJournalFlush();
-        if (thisarg.contains("m")) Validate.setMapOnly();
-        if (thisarg.contains("o")) Validate.setRecoveryOnly();
-        if (thisarg.contains("2")) Validate.setImmediateRead();
-        if (thisarg.contains("t")) Validate.setStoreTime();
-        if (thisarg.contains("i")) Validate.setIgnorePending();
-        if (thisarg.contains("s")) Validate.setSkipRead();
+        if (thisarg.contains("r"))
+          Validate.setJournalRecovery();
+        if (thisarg.contains("n"))
+          Validate.setNoJournalFlush();
+        if (thisarg.contains("m"))
+          Validate.setMapOnly();
+        if (thisarg.contains("o"))
+          Validate.setRecoveryOnly();
+        if (thisarg.contains("2"))
+          Validate.setImmediateRead();
+        if (thisarg.contains("t"))
+          Validate.setStoreTime();
+        if (thisarg.contains("i"))
+          Validate.setIgnorePending();
+        if (thisarg.contains("s"))
+          Validate.setSkipRead();
       }
 
-      else if (thisarg.startsWith("-d") )
+      else if (thisarg.startsWith("-d"))
         common.set_debug(Integer.valueOf(thisarg.substring(2)).intValue());
 
-      else if (thisarg.startsWith("-v"))
-      {
+      else if (thisarg.startsWith("-v")) {
         Validate.setValidate();
-        if (thisarg.contains("r")) Validate.setImmediateRead();
-        if (thisarg.contains("2")) Validate.setImmediateRead();
-        if (thisarg.contains("w")) Validate.setNoPreRead();
-        if (thisarg.contains("t")) Validate.setStoreTime();
-        if (thisarg.contains("c"))
-        {
+        if (thisarg.contains("r"))
+          Validate.setImmediateRead();
+        if (thisarg.contains("2"))
+          Validate.setImmediateRead();
+        if (thisarg.contains("w"))
+          Validate.setNoPreRead();
+        if (thisarg.contains("t"))
+          Validate.setStoreTime();
+        if (thisarg.contains("c")) {
           common.failure("'validate=continue' no longer supported");
           Validate.setContinueOldMap();
           return;
@@ -397,18 +366,21 @@ public class Vdbmain
 
       }
 
-      else if (thisarg.startsWith("-c"))
-      {
-        if (     thisarg.indexOf("o") != -1) force_format_only    = true;
-        else if (thisarg.indexOf("y") != -1) force_format_yes     = true;
-        else if (thisarg.indexOf("n") != -1) force_format_no      = true;
-        else /*                         */   force_fsd_cleanup    = true;
+      else if (thisarg.startsWith("-c")) {
+        if (thisarg.indexOf("o") != -1)
+          force_format_only = true;
+        else if (thisarg.indexOf("y") != -1)
+          force_format_yes = true;
+        else if (thisarg.indexOf("n") != -1)
+          force_format_no = true;
+        else
+          /*                         */ force_fsd_cleanup = true;
       }
 
       else if (thisarg.startsWith("-l"))
         scanLoopParameter(thisarg);
 
-      else if (thisarg.compareTo("-s") == 0 )
+      else if (thisarg.compareTo("-s") == 0)
         simulate = true;
 
       else if (thisarg.startsWith("-e"))
@@ -429,7 +401,7 @@ public class Vdbmain
       else if (thisarg.startsWith("-m"))
         Host.jvmcount_override = Integer.parseInt(thisarg.substring(2));
 
-      else if (thisarg.compareTo("-k") == 0 )
+      else if (thisarg.compareTo("-k") == 0)
         Vdbmain.kstat_console = true;
 
       else if (thisarg.compareTo("-") == 0)
@@ -438,9 +410,7 @@ public class Vdbmain
       else if (thisarg.startsWith("-r"))
         RD_entry.parseRestart(thisarg.substring(2));
 
-
-      else
-      {
+      else {
         common.ptod("");
         common.ptod("Invalid execution parameter: '" + thisarg + "'");
         usage();
@@ -448,19 +418,18 @@ public class Vdbmain
       }
     }
 
-    if (parm_files.size() == 0)
-    {
+    if (parm_files.size() == 0) {
       usage();
       common.ptod("No input parameters specified: ");
     }
 
   }
 
-  public static void usage()
-  {
+  public static void usage() {
     common.ptod("");
     common.ptod(" usage: ");
-    common.ptod(" ./vdbench [compare] [-f xxx] [-o xxx] [-e nn] [-i nn] [-j] [-jr] [-v] [-vq] [-s] [-k] [- \"parmfile parameters\"]");
+    common.ptod(
+        " ./vdbench [compare] [-f xxx] [-o xxx] [-e nn] [-i nn] [-j] [-jr] [-v] [-vq] [-s] [-k] [- \"parmfile parameters\"]");
     common.ptod(" ");
     common.ptod(" '-f xxx': Workload parameter file name(s). Default 'parmfile' in current directory");
     common.ptod(" '-o xxx': Output directory for reporting. Default 'output' in current directory");
@@ -501,42 +470,41 @@ public class Vdbmain
     common.ptod("                                                                     ");
     common.ptod("                                                                     ");
     common.ptod("For documentation, browse file 'vdbench.pdf' ");
-    //common.ptod("For documentation or revision updates, use your Web Browser and go to:");
-    //common.ptod("http://webhome.sfbay/nwsspe/speweb/vdbench/index.html\n\n");
+    // common.ptod("For documentation or revision updates, use your Web Browser and
+    // go to:");
+    // common.ptod("http://webhome.sfbay/nwsspe/speweb/vdbench/index.html\n\n");
   }
-
 
   /**
    * Main method for vdbench
+   * 
    * <pre>
-   * SD, WD, and RD input parameters are all stored in three vectors.
-   * RD entries are taken one at the time. The requested WDs are found, and
-   * the requested SDs.
+   * SD, WD, and RD input parameters are all stored in three vectors. RD entries
+   * are taken one at the time. The requested WDs are found, and the requested
+   * SDs.
    *
    * For each WD/combination a Workload Generator entry and WG_task is created.
    * For each thread for each SD an IO_task is created.
    *
    * The Waiter Task (WT_task) and the Reporter Task (Reporter) is started.
    *
-   * The end result is that there is one WG task for each WD, and one IO task
-   * for each thread for each SD.
+   * The end result is that there is one WG task for each WD, and one IO task for
+   * each thread for each SD.
    *
-   * The Workload Generator task (WG_task) generates one Cmd_entry for each
-   * i/o generated using the parameters specified.
-   * The Cmd entries are placed in a FIFO list (one per WG). The FIFO list of
-   * all Workload Generators are read and merged on timestamp by the Waiter task.
-   * The Waiter task waits for the correct time of day for the lowest timestamp
-   * found in the FIFO lists.
-   * When the correct time of day arrives, the Cmd entry is sent to a FIFO list
-   * for the specific SD. If multiple threads are used for an SD, each IO_task
-   * started for that SD willpick up CMD entries from the fifo.
+   * The Workload Generator task (WG_task) generates one Cmd_entry for each i/o
+   * generated using the parameters specified. The Cmd entries are placed in a
+   * FIFO list (one per WG). The FIFO list of all Workload Generators are read and
+   * merged on timestamp by the Waiter task. The Waiter task waits for the correct
+   * time of day for the lowest timestamp found in the FIFO lists. When the
+   * correct time of day arrives, the Cmd entry is sent to a FIFO list for the
+   * specific SD. If multiple threads are used for an SD, each IO_task started for
+   * that SD willpick up CMD entries from the fifo.
    *
-   * The IO_tasks start the i/o and report statistics.
-   * The Reporter task every 'interval' seconds will print these statistics.
+   * The IO_tasks start the i/o and report statistics. The Reporter task every
+   * 'interval' seconds will print these statistics.
    *
    */
-  public static void main(String args[])
-  {
+  public static void main(String args[]) {
     /* if ONLY '-o' is specified, return NEXT output dir: */
     if (onlyOutput(args))
       return;
@@ -550,19 +518,15 @@ public class Vdbmain
     if (Utils.Util.checkUtil(args))
       return;
 
-    if (args.length == 0)
-    {
+    if (args.length == 0) {
       usage();
       common.failure("No input parameters specified");
     }
 
-    try
-    {
+    try {
       /* If this is a request for SlaveJvm, pass it along: */
-      for (int i = 0; i < args.length; i++)
-      {
-        if (args[i].equals("SlaveJvm"))
-        {
+      for (int i = 0; i < args.length; i++) {
+        if (args[i].equals("SlaveJvm")) {
           SlaveJvm.main(args);
           return;
         }
@@ -574,7 +538,7 @@ public class Vdbmain
 
       /* Start interceptor: */
       Ctrl_c.activateShutdownHook();
-      //Shutdown.activateShutdownHook();
+      // Shutdown.activateShutdownHook();
 
       common.stdout = new PrintWriter(System.out, true);
 
@@ -583,19 +547,16 @@ public class Vdbmain
       System.out.println("For documentation, see 'vdbench.pdf'.");
       System.out.println();
 
-
-      /* Get execution parameters:   */
+      /* Get execution parameters: */
       pdm_output = PdmStart.lookForOutputDir(args);
       check_args(args);
       RshDeamon.readPortNumbers();
 
       /* Parse everything we've got: */
       parms_report = Report.createHmtlFile("parmscan.html");
-      //Vdb_scan.copy_file = Report.createHmtlFile("parmfile.html");
-      Report.getSummaryReport().printHtmlLink("Copy of input parameter files",
-                                              "parmfile", "parmfile");
-      Report.getSummaryReport().printHtmlLink("Copy of parameter scan detail",
-                                              "parmscan", "parmscan");
+      // Vdb_scan.copy_file = Report.createHmtlFile("parmfile.html");
+      Report.getSummaryReport().printHtmlLink("Copy of input parameter files", "parmfile", "parmfile");
+      Report.getSummaryReport().printHtmlLink("Copy of parameter scan detail", "parmscan", "parmscan");
       /* Just in case we die very early: */
       Report.flushAllReports();
 
@@ -606,8 +567,7 @@ public class Vdbmain
       // Decided that for Vdbench to start looking like the filebench
       // 'personality' stuff would be a serious degrade of the usability of
       // Vdbench and I therefore decided to NOT do this.
-      if (RD_entry.getExtraWDs().size() > 0)
-      {
+      if (RD_entry.getExtraWDs().size() > 0) {
         Vdb_scan.Vdb_scan_read(RD_entry.getExtraWDs(), false);
         parseParameterLines();
       }
@@ -628,21 +588,17 @@ public class Vdbmain
       /* This really starts everything: */
       masterRun();
 
-      if (Vdbmain.simulate)
-      {
+      if (Vdbmain.simulate) {
         RD_entry.displaySimulatedRuns();
         common.ptod("Vdbench simulation completed successfully. Output directory: %s \n", output_dir);
         common.ptod("Vdbench simulation completed successfully", common.summ_html);
       }
 
-      else if (reporter.monitor_kill)
-      {
+      else if (reporter.monitor_kill) {
         common.ptod("Vdbench execution killed by user. Output directory: %s \n", output_dir);
         common.ptod("Vdbench execution killed by user", common.summ_html);
         Status.printStatus("Vdbench killed");
-      }
-      else
-      {
+      } else {
         /* This String may not change!! */
         common.ptod("Vdbench execution completed successfully. Output directory: %s \n", output_dir);
         common.ptod("Vdbench execution completed successfully", common.summ_html);
@@ -660,9 +616,7 @@ public class Vdbmain
       vdbench_ended = true;
     }
 
-
-    catch (Throwable t)
-    {
+    catch (Throwable t) {
       common.abnormal_term(t);
     }
 
@@ -678,13 +632,10 @@ public class Vdbmain
     Report.closeAllReports();
   }
 
-
   /**
-   * Parse all lines from the parameter files.
-   * Parameters have a required order.
+   * Parse all lines from the parameter files. Parameters have a required order.
    */
-  private static void parseParameterLines()
-  {
+  private static void parseParameterLines() {
 
     /* Get all misc parameters first, then hosts: */
     String next = MiscParms.readParms();
@@ -694,8 +645,7 @@ public class Vdbmain
     String[] original = Vdb_scan.list_of_parameters;
     Vdb_scan.list_of_parameters = InsertHosts.replaceNumberOfHosts(original);
     Vdb_scan.list_of_parameters = InsertHosts.repeatParameters(Vdb_scan.list_of_parameters);
-    if (InsertHosts.anyChangesMade(original, Vdb_scan.list_of_parameters))
-    {
+    if (InsertHosts.anyChangesMade(original, Vdb_scan.list_of_parameters)) {
       Vdb_scan.external_parms_used = true;
       next = Vdb_scan.completedHostRepeat();
     }
@@ -703,17 +653,17 @@ public class Vdbmain
     InsertHosts.lookForMissingSubstitutes(Vdb_scan.list_of_parameters);
 
     /* If any extra stuff like includes or command line overrides were done */
-    /* it mayu be difficult to quickly see what we all have.                */
-    /* This is an abandoned attempt to copy everything to parmscan.html.    */
-    //if (Vdb_scan.external_parms_used)
-    //{
-    //  for (String prm : Vdb_scan.list_of_parameters)
-    //  {
-    //    if (prm == null)
-    //      break;
-    //    common.ptod("Some external used: " + prm);
-    //  }
-    //}
+    /* it mayu be difficult to quickly see what we all have. */
+    /* This is an abandoned attempt to copy everything to parmscan.html. */
+    // if (Vdb_scan.external_parms_used)
+    // {
+    // for (String prm : Vdb_scan.list_of_parameters)
+    // {
+    // if (prm == null)
+    // break;
+    // common.ptod("Some external used: " + prm);
+    // }
+    // }
 
     /* Get all replay info: */
     next = ReplayRun.readParms(next);
@@ -742,8 +692,7 @@ public class Vdbmain
       ConcatSds.createConcatSds(wd_list, rd_list);
 
     /* If needed put a 'journal recovery' RD at the beginning: */
-    if (Validate.isJournalRecovery())
-    {
+    if (Validate.isJournalRecovery()) {
       if (Vdbmain.isWdWorkload())
         Jnl_entry.setupSDJournalRecoveryRun();
       else
@@ -756,29 +705,28 @@ public class Vdbmain
     Report.setupAuxReporting();
   }
 
-
-
   public static Reporter reporter = null;
-  private static void masterRun()
-  {
-    /* Using the host names and the requested JVM counts, create a list of
-    /* slaves (this list can be expanded later): */
+
+  private static void masterRun() {
+    /*
+     * Using the host names and the requested JVM counts, create a list of /* slaves
+     * (this list can be expanded later):
+     */
     Host.createSlaves();
 
-    /* Convert the RD list that we got from reading the parameter file  */
+    /* Convert the RD list that we got from reading the parameter file */
     /* to one containing all extra RDs needed for the forxx parameters: */
-    /* See also WG_entry.adjustJvmCount()                               */
+    /* See also WG_entry.adjustJvmCount() */
     if (Vdbmain.isFwdWorkload())
       rd_list = RD_entry.buildNewRdListForFwd();
 
-    else
-    {
+    else {
       /* Build the list allowing adjustment of JVM count: */
       RD_entry.buildNewRdListForWd();
 
-      /* Rebuild the list again in case the JVM count changed:           */
+      /* Rebuild the list again in case the JVM count changed: */
       /* Redoing this is required because the first thing we do is start */
-      /* all slaves and ask them for config info.                        */
+      /* all slaves and ask them for config info. */
       RD_entry.printWgInfo("Begin second pass....");
       rd_list = RD_entry.buildNewRdListForWd();
       RD_entry.printWgInfo("End second pass....");
@@ -793,15 +741,15 @@ public class Vdbmain
     open_print_files();
     Report.createHostSummaryFiles();
     Report.createSlaveSummaryFiles();
-    //if (isFwdWorkload())
+    // if (isFwdWorkload())
     {
-      //Report.createSlaveFsdFiles();    tbd
+      // Report.createSlaveFsdFiles(); tbd
       Report.createSummaryHistogramFile();
-      //Report.createHostHistogramFiles();   tbd
-      //Report.createSlaveHistogramFiles();  tbd
+      // Report.createHostHistogramFiles(); tbd
+      // Report.createSlaveHistogramFiles(); tbd
     }
 
-    //if (Vdbmain.isWdWorkload())
+    // if (Vdbmain.isWdWorkload())
     Report.createSkewFile();
 
     /* Make sure everyone can read these reports before we go further: */
@@ -856,14 +804,12 @@ public class Vdbmain
       ReplayRun.setupTraceRun();
 
     /* For a simulate we're done now: */
-    if (Vdbmain.simulate)
-    {
+    if (Vdbmain.simulate) {
       SlaveList.shutdownAllSlaves();
       ThreadControl.shutdownAll("Vdb.HeartBeat");
       SlaveList.waitForAllSlavesShutdown();
       return;
     }
-
 
     /* Reporter takes care of the whole Vdbench execution: */
     reporter = new Reporter();
@@ -879,63 +825,53 @@ public class Vdbmain
     ThreadControl.shutdownAll("Vdb.HeartBeat");
     SlaveList.waitForAllSlavesShutdown();
 
-
   }
 
-
-  public static void setFwdWorkload()
-  {
+  public static void setFwdWorkload() {
     fwd_workload = true;
   }
-  public static boolean isFwdWorkload()
-  {
+
+  public static boolean isFwdWorkload() {
     if (SlaveJvm.isThisSlave())
       common.failure("'isFwdWorkload' for Vdbmain requested on slave");
     return fwd_workload;
   }
-  public static boolean isWdWorkload()
-  {
+
+  public static boolean isWdWorkload() {
     if (SlaveJvm.isThisSlave())
       common.failure("'isWdWorkload' for Vdbmain requested on slave");
     return !fwd_workload;
   }
 
-
   /**
    * Issue a warning if a beta version is more than 90 days old.
    */
-  private static void displayBetaWarning()
-  {
+  private static void displayBetaWarning() {
     common.log_html.println(c);
-    common.log_html.println("Vdbench distribution: " + Dist.version +"\n");
+    common.log_html.println("Vdbench distribution: " + Dist.version + "\n");
 
-    if (Fget.file_exists(ClassPath.classPath("Owner.txt")))
-    {
+    if (Fget.file_exists(ClassPath.classPath("Owner.txt"))) {
       Fget fg = new Fget(ClassPath.classPath("Owner.txt"));
       common.plog("Owner string: " + fg.get());
       fg.close();
     }
 
-    try
-    {
+    try {
       // Mon Aug 18 15:37:28 MDT 2008
-      DateFormat df = new SimpleDateFormat( "EEE MMM dd HH:mm:ss zzz yyyy" );
+      DateFormat df = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
 
-      //Dist.compiled = "Mon may 18 15:37:28 MDT 2008";
-      //Dist.version = "beta5";
+      // Dist.compiled = "Mon may 18 15:37:28 MDT 2008";
+      // Dist.version = "beta5";
 
       /* If there is no date or version we don't care: */
       if (Dist.compiled == null || Dist.compiled == null)
         return;
 
       /* Beta versions have 'rc' or 'beta' in the version: */
-      if (Dist.version.indexOf("rc")   != -1 ||
-          Dist.version.indexOf("beta") != -1)
-      {
+      if (Dist.version.indexOf("rc") != -1 || Dist.version.indexOf("beta") != -1) {
         Date comp = df.parse(Dist.compiled);
-        Date now  = new Date();
-        if (now.getTime() - comp.getTime() > (90 * 24 * 60 * 60 * 1000l))
-        {
+        Date now = new Date();
+        if (now.getTime() - comp.getTime() > (90 * 24 * 60 * 60 * 1000l)) {
           common.ptod("*");
           common.ptod("* This beta version '" + Dist.version + "' was built on " + Dist.compiled + ".");
           common.ptod("* which is more than 90 days ago.");
@@ -955,36 +891,28 @@ public class Vdbmain
           common.psum("*");
         }
       }
-    }
-    catch (Exception e)
-    {
-      System.out.println("No valid compile date present: " +
-                         Dist.version + "/" + Dist.compiled);
+    } catch (Exception e) {
+      System.out.println("No valid compile date present: " + Dist.version + "/" + Dist.compiled);
     }
 
     return;
   }
 
-  private static void checkJavaVersion()
-  {
+  private static void checkJavaVersion() {
     if (common.get_debug(common.USE_ANY_JAVA))
       return;
-    if (!JVMCheck.isJREValid(System.getProperty("java.version"), 1, 7, 0))
-    {
+    if (!JVMCheck.isJREValid(System.getProperty("java.version"), 1, 7, 0)) {
       System.out.print("*\n*\n*\n");
-      System.out.println("* Minimum required Java version for Vdbench is 1.7.0; \n" +
-                         "* You are currently running " + System.getProperty("java.version") +
-                         "\n* Vdbench terminated.");
+      System.out.println("* Minimum required Java version for Vdbench is 1.7.0; \n" + "* You are currently running "
+          + System.getProperty("java.version") + "\n* Vdbench terminated.");
       System.out.println("*\n*\n*\n");
 
       System.exit(-99);
     }
   }
 
-  private static boolean anySpecialTricks(String[] args)
-  {
-    try
-    {
+  private static boolean anySpecialTricks(String[] args) {
+    try {
       /* Some main() calls expect the first argument to be removed: */
       String[] nargs = new String[args.length - 1];
       System.arraycopy(args, 1, nargs, 0, nargs.length);
@@ -1002,10 +930,10 @@ public class Vdbmain
         Jstack.main(args);
 
       /* Vdbench jmap?? */
-      else if (args[0].equals("jmap"))
-      {
+      else if (args[0].equals("jmap")) {
         Jmap.main(args);
-        common.exit(0);;
+        common.exit(0);
+        ;
       }
 
       /* SD building? */
@@ -1019,15 +947,12 @@ public class Vdbmain
       else if (args[0].equalsIgnoreCase("rsh"))
         RshDeamon.main(args);
 
-      else if (args.length > 0 &&
-               (args[0].equalsIgnoreCase("print") ||
-                args[0].equalsIgnoreCase("-print")))
+      else if (args.length > 0 && (args[0].equalsIgnoreCase("print") || args[0].equalsIgnoreCase("-print")))
         PrintBlock.print(args);
 
-      else if (args[0].equalsIgnoreCase("dvpost"))
-      {
-        common.failure("DvPost no longer exists in the current verion. "+
-                       "That decision possibly needs to be re-evaluated");
+      else if (args[0].equalsIgnoreCase("dvpost")) {
+        common.failure(
+            "DvPost no longer exists in the current verion. " + "That decision possibly needs to be re-evaluated");
         DVPost.main(args);
       }
 
@@ -1054,9 +979,7 @@ public class Vdbmain
         return false;
 
       return true;
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       common.failure(e);
     }
 
@@ -1066,10 +989,8 @@ public class Vdbmain
   /**
    * Using the -t parameter creates a very simple test run.
    */
-  private static String createQuickTest(String arg)
-  {
-    try
-    {
+  private static String createQuickTest(String arg) {
+    try {
       String tmpdir = Fput.getTmpDir();
       Fput fp = new Fput(tmpdir, "parmfile");
       String extra = "";
@@ -1077,11 +998,13 @@ public class Vdbmain
       if (arg.equals("-td"))
         new File(tmpdir, "quick_vdbench_test").delete();
 
-      if (arg.equals("-t1"))
-      {
-        if (common.onSolaris()) extra = ",openflags=o_sync";
-        if (common.onWindows()) extra = ",openflags=directio";
-        if (common.onLinux())   extra = ",openflags=o_sync";
+      if (arg.equals("-t1")) {
+        if (common.onSolaris())
+          extra = ",openflags=o_sync";
+        if (common.onWindows())
+          extra = ",openflags=directio";
+        if (common.onLinux())
+          extra = ",openflags=o_sync";
         fp.println("*");
         fp.println("* This sample parameter file first creates a temporary file");
         fp.println("* if this is the first time the file is referenced.");
@@ -1092,8 +1015,7 @@ public class Vdbmain
         fp.println("rd=rd1,wd=wd1,iorate=100,elapsed=5,interval=1");
       }
 
-      else if (arg.equals("-t2"))
-      {
+      else if (arg.equals("-t2")) {
         fp.println("*");
         fp.println("* This sample parameter file first creates a temporary file");
         fp.println("* if this is the first time the file is referenced.");
@@ -1104,8 +1026,7 @@ public class Vdbmain
         fp.println("rd=rd1,wd=wd1,iorate=max,elapsed=5,interval=1");
       }
 
-      else if (arg.equals("-tf"))
-      {
+      else if (arg.equals("-tf")) {
         fp.println("");
         fp.println("                                                                             ");
         fp.println("* Random read and write of randomly selected files.                          ");
@@ -1127,8 +1048,7 @@ public class Vdbmain
         fp.println("rd=rd1,fwd=fwd*,fwdrate=100,format=yes,elapsed=5,interval=1                  ");
       }
 
-      else
-      {
+      else {
         fp.println("*");
         fp.println("* This sample parameter file first creates a temporary file");
         fp.println("* if this is the first time the file is referenced.");
@@ -1139,24 +1059,21 @@ public class Vdbmain
         fp.println("rd=rd1,wd=wd1,iorate=100,elapsed=5,interval=1");
       }
 
-
       fp.close();
       return fp.getName();
     }
 
-    catch (Exception e)
-    {
+    catch (Exception e) {
       common.failure(e);
     }
     return null;
   }
 
   /**
-   * Experiment: allow rd overrides from the command line.
-   * ./vdbench -f xxx + iorate=max
+   * Experiment: allow rd overrides from the command line. ./vdbench -f xxx +
+   * iorate=max
    */
-  private static void saveRdExtras(String[] args, int i)
-  {
+  private static void saveRdExtras(String[] args, int i) {
     /* If the first parameter is more than just a '+', strip it: */
     String arg = args[i].trim();
     if (!arg.equals("+"))
@@ -1167,18 +1084,16 @@ public class Vdbmain
       rd_parm_extras += args[i].trim() + " ";
     rd_parm_extras = rd_parm_extras.trim();
 
-    //common.ptod("Adding ',%s' to each one-line RD parameter.", rd_parm_extras);
+    // common.ptod("Adding ',%s' to each one-line RD parameter.", rd_parm_extras);
     if (rd_parm_extras.indexOf(" ") != -1)
       common.failure("Embedded blanks not acceptable: '%s'", rd_parm_extras);
   }
 
-
   /**
-   * -l nnn parameter.
-   * Without 'nn', loop is endless, with it ends after 'nn' seconds.
+   * -l nnn parameter. Without 'nn', loop is endless, with it ends after 'nn'
+   * seconds.
    */
-  private static void scanLoopParameter(String parm)
-  {
+  private static void scanLoopParameter(String parm) {
     loop_all_runs = true;
     if (parm.equals("-l"))
       return;
@@ -1186,23 +1101,16 @@ public class Vdbmain
     String number = parm.substring(2);
 
     int multiplier = 1;
-    if (number.endsWith("s"))
-    {
+    if (number.endsWith("s")) {
       multiplier = 1;
-      number = number.substring(0, number.length() -1);
-    }
-    else if (number.endsWith("m"))
-    {
+      number = number.substring(0, number.length() - 1);
+    } else if (number.endsWith("m")) {
       multiplier = 60;
-      number = number.substring(0, number.length() -1);
-    }
-    else if (number.endsWith("h"))
-    {
+      number = number.substring(0, number.length() - 1);
+    } else if (number.endsWith("h")) {
       multiplier = 3600;
-      number = number.substring(0, number.length() -1);
-    }
-    else if (!common.isNumeric(number))
-    {
+      number = number.substring(0, number.length() - 1);
+    } else if (!common.isNumeric(number)) {
       common.failure("Expecting no parameter or a numeric paramater after '-l': " + parm);
     }
 
@@ -1210,20 +1118,17 @@ public class Vdbmain
     loop_duration *= 1000;
   }
 
-
   /**
-   * if ONLY '-o' is specified, return NEXT output dir
-   * e.g.  vdbench -o output
+   * if ONLY '-o' is specified, return NEXT output dir e.g. vdbench -o output
    */
-  private static boolean onlyOutput(String[] args)
-  {
-     if (args.length != 2)
-       return false;
-     if (!args[0].equals("-o"))
-       return false;
+  private static boolean onlyOutput(String[] args) {
+    if (args.length != 2)
+      return false;
+    if (!args[0].equals("-o"))
+      return false;
 
-     String output = reporting.rep_mkdir(args[1]);
-     System.out.println(output);
-     return true;
+    String output = reporting.rep_mkdir(args[1]);
+    System.out.println(output);
+    return true;
   }
 }

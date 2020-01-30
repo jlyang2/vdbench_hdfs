@@ -13,42 +13,31 @@ import java.net.*;
 import java.util.*;
 import Utils.Format;
 
-
-
 /**
- * Start remote command.
- * This was written to eliminate problems with Windows openSSH.
- * There were too many problems getting the proper file names
- * back and forth to windows that this was easier.
+ * Start remote command. This was written to eliminate problems with Windows
+ * openSSH. There were too many problems getting the proper file names back and
+ * forth to windows that this was easier.
  */
-public class Rsh
-{
-  private final static String c =
-  "Copyright (c) 2000, 2013, Oracle and/or its affiliates. All rights reserved.";
+public class Rsh {
+  private final static String c = "Copyright (c) 2000, 2013, Oracle and/or its affiliates. All rights reserved.";
 
-  public  SlaveSocket socket_to_remote;
+  public SlaveSocket socket_to_remote;
   private String host;
 
-
-
-  public Rsh(String host)
-  {
+  public Rsh(String host) {
     this.host = host;
   }
 
   /**
    * Connect to RshDeamon()
    */
-  public void connectToRemote()
-  {
+  public void connectToRemote() {
 
     Signal signal = new Signal(60);
 
     /* Connect to the master: */
-    while (true)
-    {
-      try
-      {
+    while (true) {
+      try {
         socket_to_remote = new SlaveSocket(host, SlaveSocket.getRemotePort());
         socket_to_remote.setSlaveLabel("rsh_to_client");
         socket_to_remote.setSlaveName("rsh_to_client");
@@ -61,8 +50,7 @@ public class Rsh
       }
 
       /* Not here, keep trying: */
-      catch (ConnectException e)
-      {
+      catch (ConnectException e) {
         if (signal.go())
           common.failure("Vdbench rsh connection failure.");
         common.ptod("");
@@ -75,12 +63,9 @@ public class Rsh
       }
 
       /* Any errors at this time are fatal: */
-      catch (UnknownHostException e)
-      {
+      catch (UnknownHostException e) {
         common.failure(e);
-      }
-      catch (IOException e)
-      {
+      } catch (IOException e) {
         common.failure(e);
       }
 
@@ -91,42 +76,34 @@ public class Rsh
     }
   }
 
-
   /**
    * Get messages from RshDeamon()
    */
-  private void getRemoteOutput(Slave slave)
-  {
+  private void getRemoteOutput(Slave slave) {
     String label = slave.getLabel();
 
-    while (true)
-    {
-      try
-      {
+    while (true) {
+      try {
         SocketMessage sm = socket_to_remote.getMessage();
 
-        if (sm.getMessageNum() == SocketMessage.RSH_STDERR_OUTPUT)
-        {
+        if (sm.getMessageNum() == SocketMessage.RSH_STDERR_OUTPUT) {
           String line = (String) sm.getData();
           slave.getConsoleLog().println(common.tod() + " stderr: " + line);
         }
 
-        else if (sm.getMessageNum() == SocketMessage.RSH_STDOUT_OUTPUT)
-        {
+        else if (sm.getMessageNum() == SocketMessage.RSH_STDOUT_OUTPUT) {
           String line = (String) sm.getData();
           slave.getConsoleLog().println(common.tod() + " " + line);
 
           /* A fatal error message is handled right away: */
-          if (common.isFatal(line))
-          {
+          if (common.isFatal(line)) {
             common.ptod("Fatal error message received from slave " + label);
             common.psum("Fatal error message received from slave " + label);
             common.notifySlaves();
           }
         }
 
-        else if (sm.getMessageNum() == SocketMessage.RSH_COMMAND)
-        {
+        else if (sm.getMessageNum() == SocketMessage.RSH_COMMAND) {
           break;
         }
 
@@ -134,8 +111,7 @@ public class Rsh
           common.failure("Unknown socket message: " + sm.getMessageText());
       }
 
-      catch (Exception e)
-      {
+      catch (Exception e) {
         common.ptod("Exception in getRemoteOutput(): " + label);
         common.failure(e);
       }
@@ -144,30 +120,24 @@ public class Rsh
     socket_to_remote.close();
   }
 
-  public void getRemoteSwatOutput()
-  {
+  public void getRemoteSwatOutput() {
     String label = "swatlabel";
 
-    while (true)
-    {
-      try
-      {
+    while (true) {
+      try {
         SocketMessage sm = socket_to_remote.getMessage();
 
-        if (sm.getMessageNum() == SocketMessage.RSH_STDERR_OUTPUT)
-        {
+        if (sm.getMessageNum() == SocketMessage.RSH_STDERR_OUTPUT) {
           String line = (String) sm.getData();
           common.ptod(" stderr: " + line);
         }
 
-        else if (sm.getMessageNum() == SocketMessage.RSH_STDOUT_OUTPUT)
-        {
+        else if (sm.getMessageNum() == SocketMessage.RSH_STDOUT_OUTPUT) {
           String line = (String) sm.getData();
           common.ptod(" stdout: " + line);
         }
 
-        else if (sm.getMessageNum() == SocketMessage.RSH_COMMAND)
-        {
+        else if (sm.getMessageNum() == SocketMessage.RSH_COMMAND) {
           break;
         }
 
@@ -175,8 +145,7 @@ public class Rsh
           common.failure("Unknown socket message: " + sm.getMessageText());
       }
 
-      catch (Exception e)
-      {
+      catch (Exception e) {
         common.ptod("Exception in getRemoteOutput(): " + label);
         common.failure(e);
       }
@@ -185,13 +154,10 @@ public class Rsh
     socket_to_remote.close();
   }
 
-
-
   /**
    * Send a command request to a remote system.
    */
-  public static void issueCommand(Slave slave, String cmd)
-  {
+  public static void issueCommand(Slave slave, String cmd) {
     Rsh rsh = new Rsh(slave.getSlaveIP());
 
     /* Connect to the master: */
@@ -205,7 +171,7 @@ public class Rsh
     rsh.getRemoteOutput(slave);
 
     /* When we come back here the master has told us to nicely shut down */
-    /* by returning to use the RSH_COMMAND message:                      */
+    /* by returning to use the RSH_COMMAND message: */
     rsh.socket_to_remote.close();
 
   }
@@ -213,8 +179,7 @@ public class Rsh
   /**
    * Send a command request to a remote system.
    */
-  public static void main(String[] args)
-  {
+  public static void main(String[] args) {
     /* Strip off the IP: */
     String ip = args[0];
 
@@ -236,7 +201,7 @@ public class Rsh
     rsh.getRemoteSwatOutput();
 
     /* When we come back here the master has told us to nicely shut down */
-    /* by returning to use the RSH_COMMAND message:                      */
+    /* by returning to use the RSH_COMMAND message: */
     rsh.socket_to_remote.close();
 
   }
@@ -244,40 +209,38 @@ public class Rsh
   /**
    * This is NOT the main, started by the master to do all the work.
    */
-  public static void mainold(String[] args) throws Exception
-  {
-    //String cmd = "ls -l /var/tmp";
+  public static void mainold(String[] args) throws Exception {
+    // String cmd = "ls -l /var/tmp";
     Rsh rsh = new Rsh("sbm-thor-a");
 
-    String cmd =
-    "script                                                         \n" +
-    "                                                               \n" +
-    "  run('shares');                                               \n" +
-    "  projects = list();                                           \n" +
-    "                                                               \n" +
-    "  printf('%-40s %-10s %-10s\\n', 'SHARE', 'USED', 'AVAILABLE');\n" +
-    "                                                               \n" +
-    "                                                               \n" +
-    "                                                               \n" +
-    "  for (i = 0; i < projects.length; i++)                        \n" +
-    "  {                                                            \n" +
-    "    run('select ' + projects[i]);                              \n" +
-    "    shares = list();                                           \n" +
-    "                                                               \n" +
-    "    for (j = 0; j < shares.length; j++)                        \n" +
-    "    {                                                          \n" +
-    "      run('select ' + shares[j]);                              \n" +
-    "                                                               \n" +
-    "      share = projects[i] + '/' + shares[j];                   \n" +
-    "      used  = run('get space_data').split(/\\s+/)[3];          \n" +
-    "      avail = run('get space_available').split(/\\s+/)[3];     \n" +
-    "                                                               \n" +
-    "      printf('%-40s %-10s %-10s\\n', share, used, avail);      \n" +
-    "      run('cd ..');                                            \n" +
-    "    }                                                          \n" +
-    "                                                               \n" +
-    "  run('cd ..');                                                \n" +
-    "  }                                                            \n";
+    String cmd = "script                                                         \n"
+        + "                                                               \n"
+        + "  run('shares');                                               \n"
+        + "  projects = list();                                           \n"
+        + "                                                               \n"
+        + "  printf('%-40s %-10s %-10s\\n', 'SHARE', 'USED', 'AVAILABLE');\n"
+        + "                                                               \n"
+        + "                                                               \n"
+        + "                                                               \n"
+        + "  for (i = 0; i < projects.length; i++)                        \n"
+        + "  {                                                            \n"
+        + "    run('select ' + projects[i]);                              \n"
+        + "    shares = list();                                           \n"
+        + "                                                               \n"
+        + "    for (j = 0; j < shares.length; j++)                        \n"
+        + "    {                                                          \n"
+        + "      run('select ' + shares[j]);                              \n"
+        + "                                                               \n"
+        + "      share = projects[i] + '/' + shares[j];                   \n"
+        + "      used  = run('get space_data').split(/\\s+/)[3];          \n"
+        + "      avail = run('get space_available').split(/\\s+/)[3];     \n"
+        + "                                                               \n"
+        + "      printf('%-40s %-10s %-10s\\n', share, used, avail);      \n"
+        + "      run('cd ..');                                            \n"
+        + "    }                                                          \n"
+        + "                                                               \n"
+        + "  run('cd ..');                                                \n"
+        + "  }                                                            \n";
 
     cmd = "echo \"" + cmd + "\" > /var/tmp/henk ; chmod +x /var/tmp/henk ; /var/tmp/henk";
     common.ptod("cmd: " + cmd);
@@ -293,41 +256,33 @@ public class Rsh
     rsh.testRemoteOutput("xx");
 
     /* When we come back here the master has told us to nicely shut down */
-    /* by returning to use the RSH_COMMAND message:                      */
+    /* by returning to use the RSH_COMMAND message: */
     rsh.socket_to_remote.close();
   }
 
-
-  private void testRemoteOutput(String label)
-  {
-    while (true)
-    {
-      try
-      {
+  private void testRemoteOutput(String label) {
+    while (true) {
+      try {
         SocketMessage sm = socket_to_remote.getMessage();
 
-        if (sm.getMessageNum() == SocketMessage.RSH_STDERR_OUTPUT)
-        {
+        if (sm.getMessageNum() == SocketMessage.RSH_STDERR_OUTPUT) {
           String line = (String) sm.getData();
           common.ptod("stderr: " + line);
         }
 
-        else if (sm.getMessageNum() == SocketMessage.RSH_STDOUT_OUTPUT)
-        {
+        else if (sm.getMessageNum() == SocketMessage.RSH_STDOUT_OUTPUT) {
           String line = (String) sm.getData();
           common.ptod("stdout: " + line);
 
           /* A fatal error message is handled right away: */
-          if (common.isFatal(line))
-          {
+          if (common.isFatal(line)) {
             common.ptod("Fatal error message received from slave " + label);
             common.psum("Fatal error message received from slave " + label);
             common.notifySlaves();
           }
         }
 
-        else if (sm.getMessageNum() == SocketMessage.RSH_COMMAND)
-        {
+        else if (sm.getMessageNum() == SocketMessage.RSH_COMMAND) {
           break;
         }
 
@@ -335,8 +290,7 @@ public class Rsh
           common.failure("Unknown socket message: " + sm.getMessageText());
       }
 
-      catch (Exception e)
-      {
+      catch (Exception e) {
         common.ptod("Exception in getRemoteOutput(): " + label);
         common.failure(e);
       }
@@ -346,4 +300,3 @@ public class Rsh
   }
 
 }
-

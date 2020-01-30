@@ -14,30 +14,24 @@ package Vdb;
  * The objective is to select a file and give it to 'curl' so that the file can
  * be put on the cloud. Somewhere.
  */
-class OpGetCloud extends FwgThread
-{
-  private final static String c =
-  "Copyright (c) 2000, 2016, Oracle and/or its affiliates. All rights reserved.";
+class OpGetCloud extends FwgThread {
+  private final static String c = "Copyright (c) 2000, 2016, Oracle and/or its affiliates. All rights reserved.";
 
   private CurlHandling curl;
 
-  public OpGetCloud(Task_num tn, FwgEntry fwg)
-  {
+  public OpGetCloud(Task_num tn, FwgEntry fwg) {
     super(tn, fwg);
     curl = fwg.anchor.curl;
   }
 
-  protected boolean doOperation()
-  {
+  protected boolean doOperation() {
     /* First get a file to fiddle with: */
-    while (!SlaveJvm.isWorkloadDone())
-    {
+    while (!SlaveJvm.isWorkloadDone()) {
       FileEntry fe = findFileToRead();
       if (fe == null)
         return false;
 
-      if (curl.file_map.get(fe.getFullName()) == null)
-      {
+      if (curl.file_map.get(fe.getFullName()) == null) {
         block(Blocked.FILE_MUST_EXIST);
         fe.setUnBusy();
         continue;
@@ -55,4 +49,3 @@ class OpGetCloud extends FwgThread
     return true;
   }
 }
-

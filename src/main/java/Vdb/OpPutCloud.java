@@ -14,31 +14,24 @@ package Vdb;
  * The objective is to select a file and give it to 'curl' so that the file can
  * be put on the cloud. Somewhere.
  */
-class OpPutCloud extends FwgThread
-{
-  private final static String c =
-  "Copyright (c) 2000, 2016, Oracle and/or its affiliates. All rights reserved.";
-
+class OpPutCloud extends FwgThread {
+  private final static String c = "Copyright (c) 2000, 2016, Oracle and/or its affiliates. All rights reserved.";
 
   private CurlHandling curl;
 
-  public OpPutCloud(Task_num tn, FwgEntry fwg)
-  {
+  public OpPutCloud(Task_num tn, FwgEntry fwg) {
     super(tn, fwg);
     curl = fwg.anchor.curl;
   }
 
-  protected boolean doOperation()
-  {
+  protected boolean doOperation() {
 
     /* First get a file to fiddle with: */
     FileEntry fe = findFileToRead();
-    if (fe == null)
-    {
+    if (fe == null) {
       common.where();
       return false;
     }
-
 
     long tod = Native.get_simple_tod();
     curl.uploadFile(fe.getFullName());
@@ -52,4 +45,3 @@ class OpPutCloud extends FwgThread
     return true;
   }
 }
-

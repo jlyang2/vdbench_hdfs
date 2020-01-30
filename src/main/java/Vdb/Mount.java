@@ -14,67 +14,54 @@ import java.util.*;
 
 import Utils.*;
 
-
 /**
  * Code to handle mount requests, including the creation of mount points.
  */
-public class Mount implements Serializable
-{
-  private final static String c =
-  "Copyright (c) 2000, 2012, Oracle and/or its affiliates. All rights reserved.";
+public class Mount implements Serializable {
+  private final static String c = "Copyright (c) 2000, 2012, Oracle and/or its affiliates. All rights reserved.";
 
   private String[] requests;
 
-
-
-  public Mount(String[] lines)
-  {
+  public Mount(String[] lines) {
     requests = lines;
 
-    for (int i = 0; i < requests.length; i++)
-    {
+    for (int i = 0; i < requests.length; i++) {
       String line = requests[i];
       String[] split = line.trim().split(" +");
       if (split.length < 2)
-        common.failure("'hd=xxx,mount=\"special [options[ mountpoint\" must contain " +
-                       "a minimum of two blank separated fields: " + line);
+        common.failure("'hd=xxx,mount=\"special [options[ mountpoint\" must contain "
+            + "a minimum of two blank separated fields: " + line);
     }
   }
 
-
   /**
-   * Mount if needed.
-   * The request[] list above contains 'complete' mount commands, where
-   * there are mutliple blank separated fields:
-   * - last field:           mountpoint.
-   * - second to last field: special.
+   * Mount if needed. The request[] list above contains 'complete' mount commands,
+   * where there are mutliple blank separated fields: - last field: mountpoint. -
+   * second to last field: special.
    *
    * The requested command is passed on 'asis', which means that the 'mount'
-   *   command can be a script or something to handle special cases?
+   * command can be a script or something to handle special cases?
    */
-  public void initialHostMount()
-  {
+  public void initialHostMount() {
     mountIfNeeded(null);
   }
-  public void mountIfNeeded(String new_options)
-  {
-    if (common.onWindows())
-    {
+
+  public void mountIfNeeded(String new_options) {
+    if (common.onWindows()) {
       common.failure("Running on Windows. No 'mount' command available.");
       return;
     }
 
     /* Split the command to pick up special, mountpoint and options: */
-    for (int i = 0; i < requests.length; i++)
-    {
+    for (int i = 0; i < requests.length; i++) {
       String[] split = requests[i].trim().split(" +");
 
       /* The last is always mount point: */
-      String mountpoint = split[split.length-1];
+      String mountpoint = split[split.length - 1];
 
       /* The second to last is always special: */
       /* The rest is options which we ignore: */
-      String special = split[split.length-2];
+      String special = split[split.length - 2];
 
       /* The first is the 'mount' command, or equivalent: */
       String mount = split[0];
@@ -99,10 +86,7 @@ public class Mount implements Serializable
     }
   }
 
-
-
-  private void createMountpoint(String mountpoint)
-  {
+  private void createMountpoint(String mountpoint) {
     File fptr = new File(mountpoint);
     if (fptr.exists() && fptr.isFile())
       common.failure("Mountpoint exists, but is a file, not a directory: " + mountpoint);
@@ -116,9 +100,7 @@ public class Mount implements Serializable
     SlaveJvm.sendMessageToConsole("Created mountpoint: " + mountpoint);
   }
 
-
-  private boolean isMountpointActive(String special, String mountpoint)
-  {
+  private boolean isMountpointActive(String special, String mountpoint) {
     String[] lines = null;
     if (common.onSolaris())
       lines = Fget.readFileToArray("/etc/mnttab");
@@ -127,16 +109,14 @@ public class Mount implements Serializable
     else
       return false;
 
-    for (int i = 0; i < lines.length; i++)
-    {
+    for (int i = 0; i < lines.length; i++) {
       String line = lines[i];
 
       /* Line contains tab characters? */
       line = common.replace(line, "\t", " ");
 
       String[] split = line.split(" +");
-      if (split.length < 4)
-      {
+      if (split.length < 4) {
         for (int j = 0; j < split.length; j++)
           common.ptod("split: " + j + " " + split[j]);
 
@@ -151,12 +131,11 @@ public class Mount implements Serializable
   }
 
   /**
-   * Always unmount 'forced'.
-   * It should not be needed, but I ran into some cases where the unmount failed
-   * because somehow the system thought it was still busy.
+   * Always unmount 'forced'. It should not be needed, but I ran into some cases
+   * where the unmount failed because somehow the system thought it was still
+   * busy.
    */
-  private void doUnMount(String mountpoint, String new_options)
-  {
+  private void doUnMount(String mountpoint, String new_options) {
     OS_cmd ocmd = new OS_cmd();
 
     if (new_options == null)
@@ -170,8 +149,7 @@ public class Mount implements Serializable
     String[] stdout = ocmd.getStdout();
     String[] stderr = ocmd.getStderr();
 
-    if (stdout.length + stderr.length > 0)
-    {
+    if (stdout.length + stderr.length > 0) {
       common.plog("Unmount command output for " + mountpoint + ":");
       for (int i = 0; i < stdout.length; i++)
         common.plog("stdout: " + stdout[i]);
@@ -183,8 +161,7 @@ public class Mount implements Serializable
       common.failure("Unmount of file system failed. See above messages. ");
   }
 
-  private void doMount(String line)
-  {
+  private void doMount(String line) {
     OS_cmd ocmd = new OS_cmd();
     ocmd.addText(line);
     ocmd.execute();
@@ -193,8 +170,7 @@ public class Mount implements Serializable
     String[] stdout = ocmd.getStdout();
     String[] stderr = ocmd.getStderr();
 
-    if (stdout.length + stderr.length > 0)
-    {
+    if (stdout.length + stderr.length > 0) {
       common.plog("Mount command output for " + line + ":");
       for (int i = 0; i < stdout.length; i++)
         common.plog("stdout: " + stdout[i]);
@@ -203,12 +179,11 @@ public class Mount implements Serializable
     }
 
     if (!rc)
-      common.failure("Mount of file system failed. See above (" +
-                     (stdout.length + stderr.length) + ") messages. ");
+      common.failure("Mount of file system failed. See above (" + (stdout.length + stderr.length) + ") messages. ");
 
     /* Just run the 'mount' command for reporting: */
     String[] split = line.trim().split(" +");
-    String mountpoint = split[split.length-1];
+    String mountpoint = split[split.length - 1];
     ocmd = new OS_cmd();
     ocmd.addText("mount | grep " + mountpoint);
     ocmd.execute();
@@ -217,8 +192,7 @@ public class Mount implements Serializable
     stdout = ocmd.getStdout();
     stderr = ocmd.getStderr();
 
-    if (stdout.length + stderr.length > 0)
-    {
+    if (stdout.length + stderr.length > 0) {
       common.plog("Mount command output for " + line + ":");
       for (int i = 0; i < stdout.length; i++)
         common.plog("stdout: " + stdout[i]);
