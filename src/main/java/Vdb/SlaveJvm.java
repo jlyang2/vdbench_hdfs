@@ -20,7 +20,8 @@ import User.UserData;
 import Utils.Getopt;
 import Utils.Semaphore;
 
-
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
 
 /**
  * Main workhorse for Vdbench. All real work is done here.
@@ -65,6 +66,8 @@ public class SlaveJvm
   /* for the numerous './vdbench Vdb.xxxx' utility calls that run from VdbMain. */
   private static int   owner_id   = 0x4d504944;
   private static int   master_pid = 0x4d504944;
+  private static FileSystem fileSys = null;
+  private static boolean isHDFS = false;
 
 
   public static boolean isThisSlave()
@@ -327,11 +330,15 @@ public class SlaveJvm
   private static void scan_args(String args[])
   {
 
-    Getopt g = new Getopt(args, "p:m:l:d:n:", 1);
+    Getopt g = new Getopt(args, "p:m:l:d:n:h", 1);
     if (!g.isOK())
       common.failure("Parameter scan error");
 
     g.print("SlaveJvm");
+
+    if (g.check('h')){
+      isHDFS = true;
+    }
 
     master_ip           = g.get_string('m');
     slave_label         = g.get_string('l');
@@ -421,6 +428,11 @@ public class SlaveJvm
         common.stdout   = new PrintWriter(System.out, true);
       }
 
+      if (isHDFS){
+        fileSys = FileSystem.get(new Configuration());
+        common.ptod(fileSys.getScheme());
+      }
+
       /* Connect to the master: */
       connectToMaster();
 
@@ -451,6 +463,10 @@ public class SlaveJvm
       //common.log_html.close();
       //
       //
+
+      if (isHDFS){
+        fileSys.close();
+      }
     }
 
 

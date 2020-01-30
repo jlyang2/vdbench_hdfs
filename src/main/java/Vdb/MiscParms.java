@@ -223,7 +223,8 @@ public class MiscParms
 
         else if ("fwd_thread_adjust".startsWith(prm.keyword))
           RD_entry.fwd_thread_adjust = prm.alphas[0].startsWith("y");
-
+        else if (prm.keyword.equals("hdfs"))
+          Vdbmain.isHDFS = true;
         else
           common.failure("Unknown keyword: " + prm.keyword);
 

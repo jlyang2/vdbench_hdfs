@@ -157,6 +157,10 @@ class SlaveStarter extends ThreadControl
       /* Add debugging flags: */
       ocmd.addText(common.get_debug_string());
 
+      if (Vdbmain.isHDFS){
+        ocmd.addText("-h");
+      }
+
       //common.where();
       //ocmd.addText(String.format(" | tee slave.%d.txt", common.getProcessId()));
 

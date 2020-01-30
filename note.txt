@@ -1,0 +1,12 @@
+java.lang.Exception: Stack trace
+	at java.lang.Thread.dumpStack(Thread.java:1336)
+	at Vdb.Slave.<init>(Slave.java:90)
+	at Vdb.Host.createSlaves(Host.java:310)
+	at Vdb.Vdbmain.masterRun(Vdbmain.java:765)
+	at Vdb.Vdbmain.main(Vdbmain.java:628)
+
+
+
+SlaveOnMaster: processSlave
+SlaveJVM: getMessagesFromMaster
+Reporter: prepareNextRun

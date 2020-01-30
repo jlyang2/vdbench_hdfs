@@ -74,6 +74,7 @@ public class Vdbmain
 
 
   static boolean kstat_console = false;
+  static boolean isHDFS = false;
 
 
   /* Unique run time value to make sure we don't fiddle with */
