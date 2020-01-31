@@ -11,6 +11,8 @@ package Vdb;
 import java.io.*;
 import java.util.*;
 
+import org.apache.hadoop.fs.Path;
+
 import Utils.*;
 
 /**
@@ -833,6 +835,18 @@ public class InfoFromHost implements Serializable {
    * the create_anchors parameter is there.
    */
   private void maybeCreateDirectory(String lun) {
+    if (SlaveJvm.isHDFS) {
+      try {
+        SlaveJvm.fileSys.mkdirs(new Path(lun));
+      } catch (IllegalArgumentException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      } catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+      return;
+    }
 
     if (fwd_workload) {
       File fptr = new File(lun);
@@ -907,7 +921,7 @@ public class InfoFromHost implements Serializable {
         if (Fget.file_exists(info.lun, NO_DISMOUNT_FILE))
           continue;
 
-        Fput fp = new Fput(info.lun, NO_DISMOUNT_FILE);
+        Fput fp = new Fput(info.lun, NO_DISMOUNT_FILE, false, SlaveJvm.isHDFS);
         fp.println("This file was created to keep anchor busy and prevent auto-dismount");
         fp.flush();
         fp.chmod(info.lun + File.separator + NO_DISMOUNT_FILE);

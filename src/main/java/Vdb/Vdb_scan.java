@@ -149,7 +149,7 @@ public class Vdb_scan {
 
       parm_html.println("\n* Contents of include file: " + include + "\n");
 
-      Fget fg = new Fget(include);
+      Fget fg = new Fget(include, false);
       String line;
       while ((line = fg.get()) != null) {
         parm_html.println(line.replace('[', ' '));

@@ -87,6 +87,9 @@ class Directory implements Serializable, Comparable {
   }
 
   private File getDirPtr() {
+    if (SlaveJvm.isHDFS){
+      return new HDFSFile(buildFullName());
+    }
     return new File(buildFullName());
   }
 

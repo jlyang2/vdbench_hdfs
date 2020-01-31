@@ -14,7 +14,10 @@ import java.util.ArrayList;
 import java.util.Vector;
 import java.util.zip.*;
 
+import org.apache.hadoop.fs.Path;
+
 import Utils.Format;
+import Vdb.SlaveJvm;
 import Vdb.common;
 
 /**
@@ -35,13 +38,32 @@ public class Fget {
   /**
    * Open input file name
    */
-  public Fget(String dir, String fname) {
-    this(dir + sep + fname);
+  public Fget(String dir, String fname, boolean isHDFS) {
+    this(dir + sep + fname, isHDFS);
   }
 
-  public Fget(String fname_in) {
+  public Fget(String dir, String fname){
+    this(dir + sep + fname, false);
+  }
+
+  public Fget(String fname_in){
+    this(fname_in, false);
+  }
+
+  public Fget(String fname_in, boolean isHDFS) {
     fname = fname_in;
-    if (fname.endsWith("-"))
+
+    if (isHDFS) {
+      DataInputStream istream;
+      try {
+        istream = SlaveJvm.fileSys.open(new Path(fname_in));
+        br = new BufferedReader(new InputStreamReader(istream));
+      } catch (IllegalArgumentException e) {
+        e.printStackTrace();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    } else if (fname.endsWith("-"))
       br = new BufferedReader(new InputStreamReader(System.in));
 
     else {
@@ -183,22 +205,31 @@ public class Fget {
     return readTextFile(new File(filename));
   }
 
-  public static String[] readFileToArray(String dir, String filename) {
+  public static String[] readFileToArray(String dir, String filename){
+    return readFileToArray(dir, filename, false);
+  }
+
+  public static String[] readFileToArray(String dir, String filename, boolean isHDFS) {
+    if (isHDFS){
+      return readHDFSFiletoArray(dir + sep + filename).toArray(new String[0]);
+    }
+
     Vector<String> lines = readFile(dir, filename);
     if (lines == null)
       return null;
     return lines.toArray(new String[0]);
   }
 
-  public static String[] readFileToArray(String filename) {
-    Vector<String> lines = readFile(filename);
-    if (lines == null)
-      return null;
-    return lines.toArray(new String[0]);
+  public static String[] readFileToArray(String filename){
+    return readFileToArray(filename, false);
   }
 
-  private static String[] obsolete_readFileToArray(File fptr) {
-    Vector<String> lines = readTextFile(fptr);
+  public static String[] readFileToArray(String filename, boolean isHDFS) {
+    if (isHDFS){
+      return readHDFSFiletoArray(filename).toArray(new String[0]);
+    }
+
+    Vector<String> lines = readFile(filename);
     if (lines == null)
       return null;
     return lines.toArray(new String[0]);
@@ -226,6 +257,22 @@ public class Fget {
     }
 
     Fget fg = new Fget(fptr);
+
+    /* Read all lines and store in vector: */
+    while (true) {
+      String line = fg.get();
+      if (line == null)
+        break;
+      output.add(line);
+    }
+    fg.close();
+
+    return output;
+  }
+  
+  private static Vector<String> readHDFSFiletoArray(String fiName){
+    Vector output = new Vector(64, 0);
+    Fget fg = new Fget(fiName, true);
 
     /* Read all lines and store in vector: */
     while (true) {

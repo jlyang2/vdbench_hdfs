@@ -12,6 +12,9 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Vector;
 
+import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.Path;
+
 import Utils.Fget;
 import Utils.OS_cmd;
 
@@ -91,6 +94,24 @@ public class LunInfoFromHost implements Serializable {
   }
 
   public void getFileInfo() {
+    if (SlaveJvm.isHDFS) {
+      try {
+        FileStatus st = SlaveJvm.fileSys.getFileStatus(new Path(lun));
+        parent_exists = lun_exists = true;
+        if (st.isFile()) {
+          read_allowed = true;
+          write_allowed = true;
+          lun_size = st.getLen();
+        }
+      } catch (FileNotFoundException e) {
+        parent_exists = true;
+        lun_exists = false;
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+      return;
+    }
+
     /* Regular file system file is much easier: */
     File fptr = new File(lun);
     File parent = fptr.getParentFile();

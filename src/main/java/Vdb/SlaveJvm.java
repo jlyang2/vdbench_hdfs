@@ -63,8 +63,8 @@ public class SlaveJvm {
   /* for the numerous './vdbench Vdb.xxxx' utility calls that run from VdbMain. */
   private static int owner_id = 0x4d504944;
   private static int master_pid = 0x4d504944;
-  private static FileSystem fileSys = null;
-  private static boolean isHDFS = false;
+  public static FileSystem fileSys = null;
+  public static boolean isHDFS = false;
 
   public static boolean isThisSlave() {
     return this_is_an_active_slave;
@@ -376,7 +376,6 @@ public class SlaveJvm {
 
       if (isHDFS) {
         fileSys = FileSystem.get(new Configuration());
-        common.ptod(fileSys.getScheme());
       }
 
       /* Connect to the master: */

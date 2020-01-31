@@ -292,9 +292,11 @@ class FwgRun {
    */
   private static ArrayList<File> getDirCleanupList(FileAnchor anchor) {
     ArrayList<File> dirs = new ArrayList(8);
-    for (File dirptr : new File(anchor.getAnchorName()).listFiles()) {
-      if (dirptr.getName().startsWith("vdb") && dirptr.isDirectory())
-        dirs.add(dirptr);
+    if (!SlaveJvm.isHDFS) {
+      for (File dirptr : new File(anchor.getAnchorName()).listFiles()) {
+        if (dirptr.getName().startsWith("vdb") && dirptr.isDirectory())
+          dirs.add(dirptr);
+      }
     }
 
     return dirs;

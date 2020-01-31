@@ -15,6 +15,11 @@ import java.util.ArrayList;
 import java.util.Vector;
 import java.util.zip.*;
 
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.Path;
+
+import Vdb.SlaveJvm;
+
 /**
  * This class reads data lines from an regular or GZIP file.
  */
@@ -29,18 +34,18 @@ public class Fput {
   private static Vector open_files = new Vector(8, 0);
 
   public Fput(String dirname, String fname) {
-    this(dirname + File.separator + fname, false);
+    this(dirname + File.separator + fname, false, false);
   }
 
   public Fput(String fname) {
-    this(fname, false);
+    this(fname, false, false);
   }
 
-  public Fput(String dirname, String fname, boolean append) {
-    this(dirname + File.separator + fname, append);
+  public Fput(String dirname, String fname, boolean append, boolean isHDFS) {
+    this(dirname + File.separator + fname, append, isHDFS);
   }
 
-  public Fput(String fname, boolean append) {
+  public Fput(String fname, boolean append, boolean isHDFS) {
     /* fname some times ends up with double separators. Fix it: */
     full_name = fname;
     full_name = full_name.replace(File.separator + File.separator, File.separator);
@@ -51,18 +56,20 @@ public class Fput {
       common.failure("null file name");
 
     try {
-      if (!fname.endsWith("-")) {
+      if (isHDFS) {
+        FSDataOutputStream ostream = SlaveJvm.fileSys.create(new Path(fname));
+        pw = new PrintWriter(ostream);
+      } else if (!fname.endsWith("-")) {
         File fptr = new File(fname);
         boolean exist = fptr.exists();
         FileOutputStream ofile = new FileOutputStream(fptr, append);
         pw = new PrintWriter(new BufferedOutputStream(ofile));
         // common.plog("Created file: " + fptr.getAbsolutePath());
+        chmod(fname);
       } else {
         pw = new PrintWriter(System.out);
         // common.plog("Created file: " + fname);
       }
-
-      chmod(fname);
 
       if (++pw_files_created % 50 == 0)
         common.ptod("Created " + pw_files_created + " report files; continue processing.");

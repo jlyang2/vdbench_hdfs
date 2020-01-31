@@ -76,7 +76,7 @@ public class ControlFile {
     int existing_files = 0;
     int existing_dirs = 0;
 
-    Fput fp = new Fput(anchor.getAnchorName(), CONTROL_FILE);
+    Fput fp = new Fput(anchor.getAnchorName(), CONTROL_FILE, false, SlaveJvm.isHDFS);
     running_checksum = 0;
 
     printAndCheck(fp, "when  %s %s anchor=%s pid=%s", ((start) ? "start" : "end"), new Date(), anchor.getAnchorName(),
@@ -141,7 +141,7 @@ public class ControlFile {
 
       /* Re-read the control file and create a checksum: */
       long checksum = 0;
-      for (String line : Fget.readFileToArray(fp.getName())) {
+      for (String line : Fget.readFileToArray(fp.getName(), SlaveJvm.isHDFS)) {
         for (int i = 0; i < line.length(); i++)
           checksum += line.charAt(i);
       }
@@ -162,7 +162,7 @@ public class ControlFile {
       }
 
       /* Now add this checksum to the end: */
-      fp = new Fput(fp.getName(), true);
+      fp = new Fput(fp.getName(), true, SlaveJvm.isHDFS);
       fp.println("checksum: %d ", checksum);
       fp.close();
 
@@ -289,7 +289,7 @@ public class ControlFile {
     long checksum = 0;
     boolean checksum_found = false;
 
-    for (String line : Fget.readFileToArray(anchor.getAnchorName(), CONTROL_FILE)) {
+    for (String line : Fget.readFileToArray(anchor.getAnchorName(), CONTROL_FILE, SlaveJvm.isHDFS)) {
       if (line.startsWith("checksum:")) {
         long old_check = Long.parseLong(line.split(" +")[1]);
         if (checksum != old_check) {
@@ -309,7 +309,7 @@ public class ControlFile {
     if (!checksum_found)
       common.failure("No checksum found in control file for %s", anchor.getAnchorName());
 
-    Fget fg = new Fget(anchor.getAnchorName(), CONTROL_FILE);
+    Fget fg = new Fget(anchor.getAnchorName(), CONTROL_FILE, SlaveJvm.isHDFS);
     String line = null;
 
     /* First get the major structure information: */

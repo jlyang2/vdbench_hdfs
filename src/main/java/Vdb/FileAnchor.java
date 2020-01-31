@@ -13,6 +13,10 @@ import java.lang.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.PathFilter;
+
 import Utils.*;
 
 /**
@@ -204,7 +208,7 @@ public class FileAnchor extends Directory implements Serializable {
 
     /* This directory must exist. I don't want to be responsible for creating */
     /* a huge amount of file structure in the wrong directory! */
-    if (!Fget.dir_exists(anchor_name))
+    if (!SlaveJvm.isHDFS && !Fget.dir_exists(anchor_name))
       common.failure("Anchor directory name does not exist: " + anchor_name);
 
     /*
@@ -832,7 +836,12 @@ public class FileAnchor extends Directory implements Serializable {
     /* of the cleanup will create it again. I can live with that. */
     /* Synchronization needed because there may be other threads doing this. */
     synchronized (this) {
-      File fptr = new File(getAnchorName(), ControlFile.CONTROL_FILE);
+      File fptr;
+      if (SlaveJvm.isHDFS) {
+        fptr = new HDFSFile(getAnchorName(), ControlFile.CONTROL_FILE);
+      } else {
+        fptr = new File(getAnchorName(), ControlFile.CONTROL_FILE);
+      }
       if (fptr.exists()) {
         if (!fptr.delete())
           common.failure("Unable to delete control file: " + fptr.getAbsolutePath());
@@ -2017,7 +2026,7 @@ public class FileAnchor extends Directory implements Serializable {
         }
 
         String fname = new File(temp, fsd + ".log").getAbsolutePath();
-        rw_log = new Fput(fname, true);
+        rw_log = new Fput(fname, true, false);
         open_rwlog_map.put(fsd, rw_log);
         rw_log.println("* This file was reopened at " + df_log.format(new Date()));
       }
@@ -2052,18 +2061,46 @@ public class FileAnchor extends Directory implements Serializable {
    * by checking to see if all subdirectories of the anchor are gone.
    */
   private void waitForCleanups() {
+    PathFilter filter = new PathFilter() {
+      public boolean accept(Path file) {
+        if (file.getName().startsWith("vdb")) {
+          return true;
+        }
+        return false;
+      }
+    };
+
     top: while (isDeletePending()) {
       /* This can happen because of 'format=limited': */
       if (SlaveJvm.isWorkloadDone())
         break;
 
-      /* Wait for all directories to be gine: */
-      File[] dirptrs = new File(getAnchorName()).listFiles();
-      for (File dirptr : dirptrs) {
-        // common.ptod("waitForCleanups: " + dirptr.getAbsolutePath());
-        if (dirptr.getName().startsWith("vdb") && dirptr.isDirectory()) {
-          common.sleep_some(100);
-          continue top;
+      if (SlaveJvm.isHDFS) {
+        FileStatus[] status;
+        try {
+          status = SlaveJvm.fileSys.listStatus(new Path(getAnchorName()), filter);
+          for (FileStatus st : status){
+            if (st.isDirectory()){
+              common.sleep_some(100);
+              continue top;
+            }
+          }
+        } catch (FileNotFoundException e) {
+          e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+          e.printStackTrace();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      } else {
+        /* Wait for all directories to be gine: */
+        File[] dirptrs = new File(getAnchorName()).listFiles();
+        for (File dirptr : dirptrs) {
+          // common.ptod("waitForCleanups: " + dirptr.getAbsolutePath());
+          if (dirptr.getName().startsWith("vdb") && dirptr.isDirectory()) {
+            common.sleep_some(100);
+            continue top;
+          }
         }
       }
 
