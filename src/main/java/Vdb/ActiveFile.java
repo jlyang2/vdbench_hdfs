@@ -12,6 +12,11 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Random;
 
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.Path;
+
 /**
  * This class contains information for a file that is currently opened for use.
  */
@@ -23,6 +28,8 @@ class ActiveFile {
   private FwgEntry active_fwg = null;
   private FwgThread calling_thread = null;
   private FwdStats active_stats = null;
+  private FSDataOutputStream outStream = null;
+  private FSDataInputStream inStream = null;
 
   public int xfersize = 0;
   private int prev_xfer = 0;
@@ -137,45 +144,62 @@ class ActiveFile {
     /* file size each time we open it. Do it at read only: */
     // For now do not abort.
     if (open_for_read) {
-      File fptr = new File(full_name);
-      if (fptr.exists() && fptr.length() != fe.getCurrentSize())
-        common.ptod("openFile(): invalid file size. Expected: " + FileAnchor.whatSize(fe.getCurrentSize()) + "; found: "
-            + FileAnchor.whatSize(new File(full_name).length()));
+      if (SlaveJvm.isHDFS) {
+        // todo:check read file
+      } else {
+        File fptr = new File(full_name);
+        if (fptr.exists() && fptr.length() != fe.getCurrentSize())
+          common.ptod("openFile(): invalid file size. Expected: " + FileAnchor.whatSize(fe.getCurrentSize())
+              + "; found: " + FileAnchor.whatSize(new File(full_name).length()));
+      }
     }
 
     if (print_open_flags)
       common.ptod("openFile flags: %s read: %-5b %s", active_fwg.open_flags, read, full_name);
 
     /* Now open the file: */
-    if ((fhandle = Native.openFile(full_name, active_fwg.open_flags, (read) ? 0 : 1)) < 0) {
-      // common.memory_usage();
-      Native.printMemoryUsage();
+    if (SlaveJvm.isHDFS) {
+      try {
+        if (open_for_read) {
+          inStream = SlaveJvm.fileSys.open(new Path(full_name));
+        } else {
+          outStream = SlaveJvm.fileSys.create(new Path(full_name));
+        }
+      } catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+    } else {
+      if ((fhandle = Native.openFile(full_name, active_fwg.open_flags, (read) ? 0 : 1)) < 0) {
+        // common.memory_usage();
+        Native.printMemoryUsage();
 
-      if (common.get_debug(common.DIRECTORY_CREATED))
-        anchor.printFileStatus();
+        if (common.get_debug(common.DIRECTORY_CREATED))
+          anchor.printFileStatus();
 
-      /* The logic needed to allow data_errors=nn for an open failure is more */
-      /* than I am willing to handle right now. TBD */
-      common.failure("open failed for " + full_name);
+        /* The logic needed to allow data_errors=nn for an open failure is more */
+        /* than I am willing to handle right now. TBD */
+        common.failure("open failed for " + full_name);
+      }
+
+      /* If the file is empty, or we don't know the size yet, don't clear cache */
+      /* (If the file exists and is not empty we SHOULD have the size already, */
+      /* but just playing it safe here) */
+      if (fe.getCurrentSize() > 0 && active_fwg.open_flags.isOther(OpenFlags.SOL_CLEAR_CACHE)) {
+        int rc = Native.eraseFileSystemCache(fhandle, fe.getCurrentSize());
+        if (rc != 0)
+          common.failure("Native.eraseFileSystemCache() failed: " + rc);
+      }
+
+      /* Keys are always needed: */
+      if (Validate.isRealValidate() || Dedup.isDedup())
+        key_map = anchor.allocateKeyMap(file_start_lba);
+      else
+        key_map = new KeyMap();
+
+      fe.setOpened();
+      File_handles.addHandle(fhandle, this);
     }
-
-    /* If the file is empty, or we don't know the size yet, don't clear cache */
-    /* (If the file exists and is not empty we SHOULD have the size already, */
-    /* but just playing it safe here) */
-    if (fe.getCurrentSize() > 0 && active_fwg.open_flags.isOther(OpenFlags.SOL_CLEAR_CACHE)) {
-      int rc = Native.eraseFileSystemCache(fhandle, fe.getCurrentSize());
-      if (rc != 0)
-        common.failure("Native.eraseFileSystemCache() failed: " + rc);
-    }
-
-    /* Keys are always needed: */
-    if (Validate.isRealValidate() || Dedup.isDedup())
-      key_map = anchor.allocateKeyMap(file_start_lba);
-    else
-      key_map = new KeyMap();
-
-    fe.setOpened();
-    File_handles.addHandle(fhandle, this);
 
     /* When using 'stopafter' we start at the current file size: */
     /* (This simulates an append) */
@@ -228,28 +252,46 @@ class ActiveFile {
   }
 
   public ActiveFile closeFile(boolean delete) {
-    if (fhandle == 0)
-      common.failure("closing handle for a file that is not open: " + full_name);
+    long size = 0;
+    if (!SlaveJvm.isHDFS) {
+      if (fhandle == 0)
+        common.failure("closing handle for a file that is not open: " + full_name);
 
-    /* Remove the file handle BEFORE closing the file. */
-    /* This prevents an other thread from reusing the same handle */
-    /* before I have the chance to remove it from the File_handles list: */
-    File_handles.remove(fhandle);
+      /* Remove the file handle BEFORE closing the file. */
+      /* This prevents an other thread from reusing the same handle */
+      /* before I have the chance to remove it from the File_handles list: */
+      File_handles.remove(fhandle);
 
-    if (print_open_flags)
-      common.ptod("closeFile flags: %s %s", active_fwg.open_flags, full_name);
+      if (print_open_flags)
+        common.ptod("closeFile flags: %s %s", active_fwg.open_flags, full_name);
 
-    long start = Native.get_simple_tod();
-    long rc = Native.closeFile(fhandle, active_fwg.open_flags);
-    if (rc != 0)
-      fileError("close failure", rc);
-    active_fwg.blocked.count(Blocked.FILE_CLOSES);
-    active_stats.count(Operations.CLOSE, start);
+      long start = Native.get_simple_tod();
+      long rc = Native.closeFile(fhandle, active_fwg.open_flags);
+      if (rc != 0)
+        fileError("close failure", rc);
+      active_fwg.blocked.count(Blocked.FILE_CLOSES);
+      active_stats.count(Operations.CLOSE, start);
 
-    fhandle = 0;
+      fhandle = 0;
+      size = new File(full_name).length();
+    } else {
+      try {
+        if (null != inStream) {
+          inStream.close();
+        }
+        if (null != outStream) {
+          outStream.close();
+        }
+        FileStatus status = SlaveJvm.fileSys.getFileStatus(new Path(full_name));
+        size = status.getLen();
+      } catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+    }
 
     /* Remember the file size for the next operations: */
-    fe.setCurrentSize(new File(full_name).length());
+    fe.setCurrentSize(size);
 
     /* If the file did not exist yet, mark it existent: */
     if (!fe.exists()) {
