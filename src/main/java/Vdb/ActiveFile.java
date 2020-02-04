@@ -191,15 +191,16 @@ class ActiveFile {
           common.failure("Native.eraseFileSystemCache() failed: " + rc);
       }
 
-      /* Keys are always needed: */
-      if (Validate.isRealValidate() || Dedup.isDedup())
-        key_map = anchor.allocateKeyMap(file_start_lba);
-      else
-        key_map = new KeyMap();
-
-      fe.setOpened();
       File_handles.addHandle(fhandle, this);
     }
+
+    /* Keys are always needed: */
+    if (Validate.isRealValidate() || Dedup.isDedup())
+      key_map = anchor.allocateKeyMap(file_start_lba);
+    else
+      key_map = new KeyMap();
+
+    fe.setOpened();
 
     /* When using 'stopafter' we start at the current file size: */
     /* (This simulates an append) */
@@ -443,8 +444,8 @@ class ActiveFile {
    */
 
   protected void writeBlock() {
-    if (native_write_buffer == 0)
-      common.failure("No write buffer available");
+    // if (native_write_buffer == 0)
+    // common.failure("No write buffer available");
 
     if (xfersize == 0)
       common.failure("zero xfersize for %s %d %d %d", full_name, fe.getFileStartLba(), next_lba, fe.getCurrentSize());
@@ -459,7 +460,20 @@ class ActiveFile {
     /* is the current size of the file stored) */
     high_write_lba = Math.max(high_write_lba, next_lba + xfersize);
 
-    if (Validate.isRealValidate() || Validate.isValidateForDedup()) {
+    if (SlaveJvm.isHDFS) {
+      long tod = Native.get_simple_tod();
+      try {
+        //set lba??
+        outStream.write(FwgThread.write_buf, FwgThread.random.nextInt(FwgThread.write_buf_len - xfersize), xfersize);
+      } catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+      
+      FwdStats.countXfer(Operations.WRITE, tod, xfersize);
+      blocks_done++;
+      bytes_done += xfersize;
+    } else if (Validate.isRealValidate() || Validate.isValidateForDedup()) {
       /* There was a need to do Data Validation without re-reading before */
       /* each new write. The added reads changed a workload so much that an */
       /* existing error never showed up. */
@@ -555,24 +569,6 @@ class ActiveFile {
     bytes_done += xfersize;
 
     return tod;
-  }
-
-  /**
-   * Normal write. No changed to data pattern needed at this time, though it may
-   * have just been overlaid with an LFSR pattern. This write is for anything
-   * without DV, Dedup or Compression.
-   */
-  private void obsolete_writeBuffer() {
-    long tod = Native.get_simple_tod();
-    common.failure("This should be obsolete");
-    long rc = Native.noDedupAndWrite(fhandle, next_lba, xfersize, native_write_buffer, -1);
-
-    FwdStats.countXfer(Operations.WRITE, tod, xfersize);
-    blocks_done++;
-    bytes_done += xfersize;
-
-    if (rc != 0)
-      fileError("WriteBuffer error", rc);
   }
 
   private void readAndValidate(int type_of_dv_read) {

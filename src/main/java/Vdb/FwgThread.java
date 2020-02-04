@@ -33,6 +33,9 @@ abstract class FwgThread extends Thread {
 
   private long native_read_buffer = 0;
   private long native_write_buffer = 0;
+  public static int write_buf_len = 1048576;
+  public static byte[] write_buf = null;
+  public static Random random = new Random();
 
   public long permit_last = 0;
   public long permit_time = 0;
@@ -94,14 +97,20 @@ abstract class FwgThread extends Thread {
 
       /* Why allocate a read buffer when not reading? Only for DV (pre/post)read */
       /* (We don't really care about resource usage for DV anyway) */
-      if (Validate.isRealValidate() || this instanceof OpRead || this instanceof OpReadWrite || this instanceof OpWrite
-          || this instanceof OpCopy || this instanceof OpMove) {
-        native_read_buffer = Native.allocBuffer(buffer_size);
+      if (!SlaveJvm.isHDFS) {
+        if (Validate.isRealValidate() || this instanceof OpRead || this instanceof OpReadWrite
+            || this instanceof OpWrite || this instanceof OpCopy || this instanceof OpMove) {
+          native_read_buffer = Native.allocBuffer(buffer_size);
+        }
       }
 
       /* Unless this is clearly read-only, create a write buffer: */
       boolean need_buffer = false;
-      if (tn == null)
+      if (SlaveJvm.isHDFS) {
+        need_buffer = false;
+        write_buf = new byte[write_buf_len];
+        random.nextBytes(write_buf);
+      } else if (tn == null)
         need_buffer = true;
       else if (this instanceof OpReadWrite)
         need_buffer = true;
