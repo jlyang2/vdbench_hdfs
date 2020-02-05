@@ -372,13 +372,6 @@ abstract class FwgThread extends Thread {
   /**
    * Note: open/close gives 8 getattrs and 7 access
    */
-  protected ActiveFile obsolete_openFile(FileEntry fe) {
-    if (fwg.getOperation() == Operations.WRITE || fwg.readpct >= 0)
-      return openForWrite(fe);
-    else
-      return openForRead(fe);
-  }
-
   protected ActiveFile openForRead(FileEntry fe) {
     ActiveFile afe = new ActiveFile(fe, fwg, native_read_buffer, native_write_buffer);
     long start = Native.get_simple_tod();

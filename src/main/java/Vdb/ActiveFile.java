@@ -463,13 +463,13 @@ class ActiveFile {
     if (SlaveJvm.isHDFS) {
       long tod = Native.get_simple_tod();
       try {
-        //set lba??
+        // set lba??
         outStream.write(FwgThread.write_buf, FwgThread.random.nextInt(FwgThread.write_buf_len - xfersize), xfersize);
       } catch (IOException e) {
         // TODO Auto-generated catch block
         e.printStackTrace();
       }
-      
+
       FwdStats.countXfer(Operations.WRITE, tod, xfersize);
       blocks_done++;
       bytes_done += xfersize;
@@ -709,8 +709,8 @@ class ActiveFile {
   private static boolean print_file_io = common.get_debug(common.PRINT_FILE_IO);
 
   protected void readBlock() {
-    if (native_read_buffer == 0)
-      common.failure("No read buffer available");
+    // if (native_read_buffer == 0)
+    // common.failure("No read buffer available");
 
     /* If the file is not full we better have just written the */
     /* block and the close() has not happened yet: */
@@ -724,11 +724,19 @@ class ActiveFile {
       else
         readAndValidate(Validate.FLAG_NORMAL_READ);
       key_map.saveCurrentTod(Timestamp.READ_ONLY);
-    }
-
-    else {
+    } else {
       long tod = Native.get_simple_tod();
-      long rc = Native.readFile(fhandle, next_lba, xfersize, native_read_buffer);
+      long rc = 0;
+      if (SlaveJvm.isHDFS) {
+        try{
+          inStream.seek(next_lba);
+          inStream.read(new byte[xfersize]);
+        }catch (Exception e){
+          rc = -1;
+        }
+      } else {
+        rc = Native.readFile(fhandle, next_lba, xfersize, native_read_buffer);
+      }
       FwdStats.countXfer(Operations.READ, tod, xfersize);
 
       if (rc != 0)

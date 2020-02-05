@@ -111,7 +111,12 @@ public class FileEntry implements Comparable {
 
       /* there is no shortcut from ControlFile: use the file system to get status: */
       else {
-        File file_ptr = new File(getFullName());
+        File file_ptr;
+        if (SlaveJvm.isHDFS) {
+          file_ptr = new HDFSFile(getFullName());
+        } else {
+          file_ptr = new File(getFullName());
+        }
         file_exists = parent.hasFile(getShortName());
         if (++queries % 1000000 == 0) {
           common.ptod("FileEntry queries: " + queries + " " + found + " " + (found * 100 / queries));

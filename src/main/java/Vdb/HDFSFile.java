@@ -81,4 +81,15 @@ class HDFSFile extends File {
 
         return false;
     }
+
+    public long length(){
+        try{
+            FileStatus st = SlaveJvm.fileSys.getFileStatus(path);
+            return st.getLen();
+        }catch(Exception e){
+
+        }
+
+        return 0;
+    }
 }
